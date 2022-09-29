@@ -40,7 +40,7 @@ export const DEFAULT_COLUMN_WIDTHS: Record<ExperimentColumnName, number> = {
   description: 148,
   duration: 96,
   forkedFrom: 128,
-  groupName: 100,
+  groupName: 150,
   id: 60,
   name: 150,
   numTrials: 74,
@@ -56,6 +56,7 @@ export const DEFAULT_COLUMN_WIDTHS: Record<ExperimentColumnName, number> = {
 export interface ProjectDetailsSettings extends InteractiveTableSettings {
   archived?: boolean;
   columns: ExperimentColumnName[];
+  group?: string[];
   label?: string[];
   pinned: Record<number, number[]>; // key is `projectId`, value is array of experimentId
   row?: number[];
@@ -104,6 +105,14 @@ const config: SettingsConfig = {
     {
       key: 'label',
       storageKey: 'label',
+      type: {
+        baseType: BaseType.String,
+        isArray: true,
+      },
+    },
+    {
+      key: 'group',
+      storageKey: 'group',
       type: {
         baseType: BaseType.String,
         isArray: true,
