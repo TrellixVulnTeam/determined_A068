@@ -33,6 +33,17 @@ See [Release Note](https://github.com/determined-ai/determined/blob/master/docs/
 - [ ] Licenses should be included for new code which was copied and/or modified from any external code.
 - [ ] If modifying `/webui/react/src/shared/` verify `make -C webui/react test-shared` passes.
 
+## Ticket
+<!---
+Retain the relevant line and replace 000 with ticket number.
+
+DET-000
+MLG-000
+WEB-000
+DESIGN-000
+No Ticket
+--->
+
 
 <!---
 ## Title
