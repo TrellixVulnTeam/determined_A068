@@ -44,8 +44,11 @@ def maybe_upgrade_ws_scheme(master_address: str) -> str:
 
 
 def make_interactive_task_url(
-    task_id: str, service_address: str, description: str, 
-    resource_pool: str, task_type: str, 
+    task_id: str,
+    service_address: str,
+    description: str,
+    resource_pool: str,
+    task_type: str,
     maxSlotsExceeded: bool,
 ) -> str:
     wait_path = (
@@ -65,7 +68,7 @@ def make_interactive_task_url(
         parse.quote(description),
         resource_pool,
         parse.quote_plus(wait_page_url),
-        str(maxSlotsExceeded).lower()
+        str(maxSlotsExceeded).lower(),
     )
     return task_web_url
 
