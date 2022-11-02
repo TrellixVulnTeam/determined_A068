@@ -471,12 +471,12 @@ func (m *Master) parseCreateExperiment(params *CreateExperimentParams, user *mod
 
 	defaulted := schemas.WithDefaults(config).(expconf.ExperimentConfig)
 	resources := defaulted.Resources()
-	poolName, err := m.rm.ResolveResourcePool(
+	resolvedResourcePool, err := m.rm.ResolveResourcePool(
 		m.system, resources.ResourcePool(), resources.SlotsPerTrial(), false)
 	if err != nil {
 		return nil, nil, false, nil, errors.Wrapf(err, "invalid resource configuration")
 	}
-
+	poolName := resolvedResourcePool.Name
 	taskContainerDefaults := m.getTaskContainerDefaults(poolName)
 	taskSpec := *m.taskSpec
 	taskSpec.TaskContainerDefaults = taskContainerDefaults
