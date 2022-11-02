@@ -62,7 +62,7 @@ def start_tensorboard(args: Namespace) -> None:
                         ),
                     )
                 if maxSlotsExceeded:
-                    warning =  """The requested job requires more slots than currently available. 
+                    warning = """The requested job requires more slots than currently available. 
                     You may need to increase cluster resources in order for the job to run."""
                     print(colored(warning, "yellow"))
                 print(colored("TensorBoard is running at: {}".format(url), "green"))
