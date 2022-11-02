@@ -597,7 +597,7 @@ func (m *Master) postExperiment(c echo.Context) (interface{}, error) {
 		}
 	}
 
-	e, err := newExperiment(m, dbExp, taskSpec)
+	e, maxSlotsExceeded, err := newExperiment(m, dbExp, taskSpec)
 	if err != nil {
 		return nil, errors.Wrap(err, "starting experiment")
 	}
@@ -621,10 +621,11 @@ func (m *Master) postExperiment(c echo.Context) (interface{}, error) {
 
 	c.Response().Header().Set(echo.HeaderLocation, fmt.Sprintf("/experiments/%v", e.ID))
 	response := model.ExperimentDescriptor{
-		ID:       e.ID,
-		Archived: false,
-		Config:   config,
-		Labels:   make([]string, 0),
+		ID:                      e.ID,
+		Archived:                false,
+		Config:                  config,
+		Labels:                  make([]string, 0),
+		MaxCurrentSlotsExceeded: maxSlotsExceeded,
 	}
 	return response, nil
 }

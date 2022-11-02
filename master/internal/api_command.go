@@ -289,6 +289,6 @@ func (a *apiServer) LaunchCommand(
 	return &apiv1.LaunchCommandResponse{
 		Command:                 cmd,
 		Config:                  protoutils.ToStruct(spec.Config),
-		CurrentMaxSlotsExceeded: maxCurrentSlotsExceeded,
+		MaxCurrentSlotsExceeded: maxCurrentSlotsExceeded,
 	}, nil
 }

@@ -4435,11 +4435,11 @@ export interface V1LaunchCommandResponse {
      */
     config: any;
     /**
-     * 
+     * If the requested slots exceeded the current max available.
      * @type {boolean}
      * @memberof V1LaunchCommandResponse
      */
-    currentMaxSlotsExceeded?: boolean;
+    maxCurrentSlotsExceeded?: boolean;
 }
 
 /**
@@ -4551,11 +4551,11 @@ export interface V1LaunchShellResponse {
      */
     config: any;
     /**
-     * 
+     * If the requested slots exceeded the current max available.
      * @type {boolean}
      * @memberof V1LaunchShellResponse
      */
-    currentMaxSlotsExceeded?: boolean;
+    maxCurrentSlotsExceeded?: boolean;
 }
 
 /**
@@ -4615,7 +4615,7 @@ export interface V1LaunchTensorboardResponse {
      */
     config: any;
     /**
-     * 
+     * If the requested slots exceeded the current max available.
      * @type {boolean}
      * @memberof V1LaunchTensorboardResponse
      */

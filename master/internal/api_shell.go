@@ -202,6 +202,6 @@ func (a *apiServer) LaunchShell(
 	return &apiv1.LaunchShellResponse{
 		Shell:                   shell,
 		Config:                  protoutils.ToStruct(spec.Config),
-		CurrentMaxSlotsExceeded: maxCurrentSlotsExceeded,
+		MaxCurrentSlotsExceeded: maxCurrentSlotsExceeded,
 	}, nil
 }
