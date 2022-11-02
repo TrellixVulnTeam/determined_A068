@@ -314,7 +314,7 @@ message CreateExperimentResponse {
   // The created experiment config.
   google.protobuf.Struct config = 2;
   // If the requested slots exceeded the current max available.
-  bool max_current_slots_exceeded  = 3;
+  bool max_current_slots_exceeded = 3;
 }
 
 // Request for the set of metrics recorded by an experiment.

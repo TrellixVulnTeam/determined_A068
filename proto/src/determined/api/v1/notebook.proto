@@ -115,5 +115,5 @@ message LaunchNotebookResponse {
   // The config;
   google.protobuf.Struct config = 2;
   // If the requested slots exceeded the current max available.
-  bool max_current_slots_exceeded  = 3;
+  bool max_current_slots_exceeded = 3;
 }
