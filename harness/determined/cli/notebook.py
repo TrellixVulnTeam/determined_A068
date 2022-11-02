@@ -48,8 +48,10 @@ def start_notebook(args: Namespace) -> None:
                     ),
                 )
                 if maxCurrentSlotsExceeded:
-                    warning = """The requested job requires more slots than currently available. 
-                    You may need to increase cluster resources in order for the job to run."""
+                    warning = (
+                        "The requested job requires more slots than currently available. "
+                        "You may need to increase cluster resources in order for the job to run."
+                    )
 
                     print(colored(warning, "yellow"))
                 print(colored("Jupyter Notebook is running at: {}".format(url), "green"))
