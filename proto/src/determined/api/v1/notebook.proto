@@ -114,5 +114,6 @@ message LaunchNotebookResponse {
   determined.notebook.v1.Notebook notebook = 1;
   // The config;
   google.protobuf.Struct config = 2;
-  bool maxCurrentSlotsExceeded  = 3;
+  // If the requested slots exceeded the current max available.
+  bool max_current_slots_exceeded  = 3;
 }
