@@ -66,7 +66,7 @@ def start_tensorboard(args: Namespace) -> None:
                         "The requested job requires more slots than currently available. ",
                         "You may need to increase cluster resources in order for the job to run.",
                     )
-                    print(colored(warning), "yellow")
+                    print(colored(warning, "yellow"))
                 print(colored("TensorBoard is running at: {}".format(url), "green"))
                 command.render_event_stream(msg)
                 break

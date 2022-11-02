@@ -1835,7 +1835,7 @@ export interface V1CreateExperimentResponse {
      */
     config: any;
     /**
-     * 
+     * If the requested slots exceeded the current max available.
      * @type {boolean}
      * @memberof V1CreateExperimentResponse
      */
@@ -4493,7 +4493,7 @@ export interface V1LaunchNotebookResponse {
      */
     config: any;
     /**
-     * 
+     * If the requested slots exceeded the current max available.
      * @type {boolean}
      * @memberof V1LaunchNotebookResponse
      */
