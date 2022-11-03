@@ -33,6 +33,13 @@ def start_tensorboard(args: Namespace) -> None:
     maxSlotsExceeded = api_resp["maxCurrentSlotsExceeded"]
     resp = api_resp["tensorboard"]
 
+    if maxSlotsExceeded:
+        warning = (
+            "Warning: The requested job requires more slots than currently available."
+            "You may need to increase cluster resources in order for the job to run."
+        )
+        print(colored(warning, "yellow"))
+
     if args.detach:
         print(resp["id"])
         return
@@ -61,12 +68,6 @@ def start_tensorboard(args: Namespace) -> None:
                             maxSlotsExceeded=api_resp["maxCurrentSlotsExceeded"],
                         ),
                     )
-                if maxSlotsExceeded:
-                    warning = (
-                        "The requested job requires more slots than currently available."
-                        "You may need to increase cluster resources in order for the job to run."
-                    )
-                    print(colored(warning, "yellow"))
                 print(colored("TensorBoard is running at: {}".format(url), "green"))
                 command.render_event_stream(msg)
                 break

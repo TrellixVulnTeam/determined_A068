@@ -101,6 +101,30 @@ func (a AgentResourceManager) IsReattachEnabledForRP(ctx actor.Messenger, rpName
 	return false
 }
 
+// CheckMaxSlotsExceeded checks if the job exceeded the maximum number of slots.
+func (a AgentResourceManager) CheckMaxSlotsExceeded(
+	ctx actor.Messenger, name string, slots int,
+) (bool, error) {
+	agents, err := a.GetAgents(ctx, &apiv1.GetAgentsRequest{})
+	if err != nil {
+		return false, fmt.Errorf("unable to query agents for resourse pool %v", name)
+	}
+	maxSlots := 0
+	for _, agent := range agents.Agents {
+		fmt.Println("AGENT")
+		fmt.Println(agent)
+		for _, resPool := range agent.ResourcePools {
+			if resPool == name {
+				maxSlots += len(agent.Slots)
+			}
+		}
+	}
+	if slots > maxSlots {
+		return true, nil
+	}
+	return false, nil
+}
+
 // ResolveResourcePool fully resolves the resource pool name.
 func (a AgentResourceManager) ResolveResourcePool(
 	ctx actor.Messenger, name string, slots int, command bool,
@@ -123,7 +147,12 @@ func (a AgentResourceManager) ResolveResourcePool(
 		if err != nil {
 			return rp, fmt.Errorf("defaulting to compute pool: %w", err)
 		}
+		currentMaxSlotsExceeded, err := a.CheckMaxSlotsExceeded(ctx, name, slots)
+		if err != nil {
+			return rp, fmt.Errorf("validating request for (%s, %d): %w", name, slots, err)
+		}
 		rp.Name = resp.PoolName
+		rp.CurrentMaxSlotsExceeded = currentMaxSlotsExceeded
 		return rp, nil
 	}
 
@@ -141,18 +170,11 @@ func (a AgentResourceManager) ResolveResourcePool(
 			return rp, errors.New("request unfulfillable, please try requesting less slots")
 		default:
 			rp.Name = name
-			agents, _ := a.GetAgents(ctx, &apiv1.GetAgentsRequest{})
-			maxSlots := 0
-			for _, agent := range agents.Agents {
-				for _, resPool := range agent.ResourcePools {
-					if resPool == name {
-						maxSlots += len(agent.Slots)
-					}
-				}
+			currentMaxSlotsExceeded, err := a.CheckMaxSlotsExceeded(ctx, name, slots)
+			if err != nil {
+				return rp, fmt.Errorf("validating request for (%s, %d): %w", name, slots, err)
 			}
-			if slots > maxSlots {
-				rp.CurrentMaxSlotsExceeded = true
-			}
+			rp.CurrentMaxSlotsExceeded = currentMaxSlotsExceeded
 			return rp, nil
 		}
 	}
