@@ -29,7 +29,7 @@ import Icon from 'shared/components/Icon';
 import useModal, { ModalHooks as Hooks, ModalCloseReason } from 'shared/hooks/useModal/useModal';
 import { Primitive } from 'shared/types';
 import { clone, flattenObject, isBoolean, unflattenObject } from 'shared/utils/data';
-import { DetError, isDetError } from 'shared/utils/error';
+import { DetError, ErrorLevel, ErrorType, isDetError } from 'shared/utils/error';
 import { roundToPrecision } from 'shared/utils/number';
 import { routeToReactUrl } from 'shared/utils/routes';
 import { validateLength } from 'shared/utils/string';
@@ -43,6 +43,7 @@ import {
   TrialHyperparameters,
   TrialItem,
 } from 'types';
+import { openNotification } from 'utils/error';
 
 import css from './useModalHyperparameterSearch.module.scss';
 
@@ -230,7 +231,7 @@ const useModalHyperparameterSearch = ({
     const newConfig = yaml.dump(baseConfig);
 
     try {
-      const { id: newExperimentId } = await createExperiment(
+      const { experiment: newExperiment, maxSlotsExceeded } = await createExperiment(
         {
           activate: true,
           experimentConfig: newConfig,
@@ -240,8 +241,20 @@ const useModalHyperparameterSearch = ({
         { signal: canceler.current?.signal },
       );
 
+      if (maxSlotsExceeded) {
+        const detError = new DetError(null, {
+          level: ErrorLevel.Warn,
+          publicMessage:
+            'The requested job requires more slots than currently available. You may need to increase cluster resources in order for the job to run.',
+          publicSubject: 'Current Maximum Slots Exceeded',
+          silent: false,
+          type: ErrorType.Server,
+        });
+        openNotification(detError);
+      }
+
       // Route to reload path to forcibly remount experiment page.
-      const newPath = paths.experimentDetails(newExperimentId);
+      const newPath = paths.experimentDetails(newExperiment.id);
       routeToReactUrl(paths.reload(newPath));
     } catch (e) {
       let errorMessage = 'Unable to create experiment.';

@@ -616,11 +616,14 @@ export const getExperiment: DetApi<
 export const createExperiment: DetApi<
   Service.CreateExperimentParams,
   Api.V1CreateExperimentResponse,
-  Type.ExperimentBase
+  Type.CreateExperimentResponse
 > = {
   name: 'createExperiment',
   postProcess: (resp: Api.V1CreateExperimentResponse) => {
-    return decoder.mapV1GetExperimentDetailsResponse(resp);
+    return {
+      experiment: decoder.mapV1GetExperimentDetailsResponse(resp),
+      maxSlotsExceeded: resp.maxCurrentSlotsExceeded || false,
+    };
   },
   request: (params: Service.CreateExperimentParams, options) => {
     return detApi.Internal.createExperiment(

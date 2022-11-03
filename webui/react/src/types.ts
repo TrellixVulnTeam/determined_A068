@@ -565,6 +565,11 @@ export interface ProjectExperiment extends ExperimentItem {
   workspaceName: string;
 }
 
+export interface CreateExperimentResponse {
+  experiment: ExperimentBase;
+  maxSlotsExceeded: boolean;
+}
+
 export interface ExperimentBase extends ProjectExperiment {
   config: ExperimentConfig;
   configRaw: RawJson; // Readonly unparsed config object.

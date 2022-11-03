@@ -293,7 +293,7 @@ export const getTrialWorkloads = generateDetApi<
 export const createExperiment = generateDetApi<
   Service.CreateExperimentParams,
   Api.V1CreateExperimentResponse,
-  Type.ExperimentBase
+  Type.CreateExperimentResponse
 >(Config.createExperiment);
 
 export const archiveExperiment = generateDetApi<
