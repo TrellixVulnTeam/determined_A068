@@ -55,8 +55,8 @@ class Telemetry {
       const telemetry = await getTelemetry({});
       const isProperKey = telemetry.segmentKey && /^[a-z0-9]{32}$/i.test(telemetry.segmentKey);
       if (isProperKey) {
-        analytics.load(telemetry.segmentKey || '');
-        analytics.page();
+        if (analytics?.load) analytics.load(telemetry.segmentKey || '');
+        if (analytics?.page) analytics.page();
         this.isLoaded = true;
       }
     } catch (e) {
