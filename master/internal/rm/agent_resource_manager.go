@@ -107,12 +107,10 @@ func (a AgentResourceManager) CheckMaxSlotsExceeded(
 ) (bool, error) {
 	agents, err := a.GetAgents(ctx, &apiv1.GetAgentsRequest{})
 	if err != nil {
-		return false, fmt.Errorf("unable to query agents for resourse pool %v", name)
+		return false, fmt.Errorf("unable to query agents for resource pool %v", name)
 	}
 	maxSlots := 0
 	for _, agent := range agents.Agents {
-		fmt.Println("AGENT")
-		fmt.Println(agent)
 		for _, resPool := range agent.ResourcePools {
 			if resPool == name {
 				maxSlots += len(agent.Slots)
