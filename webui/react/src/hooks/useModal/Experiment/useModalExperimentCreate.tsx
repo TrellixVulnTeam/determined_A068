@@ -13,8 +13,7 @@ import { clone, isEqual } from 'shared/utils/data';
 import { DetError, ErrorLevel, ErrorType, isDetError, isError } from 'shared/utils/error';
 import { routeToReactUrl } from 'shared/utils/routes';
 import { ExperimentBase, TrialHyperparameters, TrialItem } from 'types';
-import handleError from 'utils/error';
-import { openNotification } from 'utils/error';
+import handleError, { handleWarning } from 'utils/error';
 import { trialHParamsToExperimentHParams } from 'utils/experiment';
 import { upgradeConfig } from 'utils/experiment';
 
@@ -225,7 +224,7 @@ const useModalExperimentCreate = ({ onClose }: Props = {}): ModalHooks => {
           projectId: modalState.experiment.projectId,
         });
         if (maxSlotsExceeded) {
-          const detError = new DetError(null, {
+          handleWarning({
             level: ErrorLevel.Warn,
             publicMessage:
               'The requested job requires more slots than currently available. You may need to increase cluster resources in order for the job to run.',
@@ -233,7 +232,6 @@ const useModalExperimentCreate = ({ onClose }: Props = {}): ModalHooks => {
             silent: false,
             type: ErrorType.Server,
           });
-          openNotification(detError);
         }
         // Route to reload path to forcibly remount experiment page.
         const newPath = paths.experimentDetails(newExperiment.id);

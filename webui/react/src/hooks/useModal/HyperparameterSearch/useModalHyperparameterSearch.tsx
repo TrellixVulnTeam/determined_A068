@@ -43,7 +43,7 @@ import {
   TrialHyperparameters,
   TrialItem,
 } from 'types';
-import { openNotification } from 'utils/error';
+import { handleWarning } from 'utils/error';
 
 import css from './useModalHyperparameterSearch.module.scss';
 
@@ -242,7 +242,7 @@ const useModalHyperparameterSearch = ({
       );
 
       if (maxSlotsExceeded) {
-        const detError = new DetError(null, {
+        handleWarning({
           level: ErrorLevel.Warn,
           publicMessage:
             'The requested job requires more slots than currently available. You may need to increase cluster resources in order for the job to run.',
@@ -250,7 +250,6 @@ const useModalHyperparameterSearch = ({
           silent: false,
           type: ErrorType.Server,
         });
-        openNotification(detError);
       }
 
       // Route to reload path to forcibly remount experiment page.

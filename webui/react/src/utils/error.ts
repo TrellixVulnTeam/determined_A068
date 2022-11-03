@@ -21,7 +21,7 @@ const errorLevelMap = {
   [ErrorLevel.Warn]: 'warn',
 };
 
-export const openNotification = (e: DetError) => {
+const openNotification = (e: DetError) => {
   const key = errorLevelMap[e.level] as keyof NotificationApi;
   const notification = antdNotification[key] as (args: ArgsProps) => void;
 
@@ -36,6 +36,14 @@ const log = (e: DetError) => {
   const message = listToStr([`${e.type}:`, e.publicMessage, e.message]);
   e.logger[key](message);
   e.logger[key](e);
+};
+
+// Handle a warning to the user in the UI
+export const handleWarning = (warningOptions: DetErrorOptions): void => {
+  // Error object is null because this is just a warning
+  const detWarning = new DetError(null, warningOptions);
+
+  openNotification(detWarning);
 };
 
 // Handle an error at the point that you'd want to stop bubbling it up. Avoid handling

@@ -6,10 +6,9 @@ import TaskBar from 'components/TaskBar';
 import { getTask } from 'services/api';
 import useUI from 'shared/contexts/stores/UI';
 import { ValueOf } from 'shared/types';
-import { DetError, ErrorLevel, ErrorType } from 'shared/utils/error';
+import { ErrorLevel, ErrorType } from 'shared/utils/error';
 import { CommandState, CommandType } from 'types';
-import handleError from 'utils/error';
-import { openNotification } from 'utils/error';
+import handleError, { handleWarning } from 'utils/error';
 
 import css from './InteractiveTask.module.scss';
 import TaskLogs from './TaskLogs';
@@ -79,7 +78,7 @@ export const InteractiveTask: React.FC = () => {
 
   useEffect(() => {
     if (currentMaxSlotsExceeded) {
-      const detError = new DetError(null, {
+      handleWarning({
         level: ErrorLevel.Warn,
         publicMessage:
           'The requested job requires more slots than currently available. You may need to increase cluster resources in order for the job to run.',
@@ -87,7 +86,6 @@ export const InteractiveTask: React.FC = () => {
         silent: false,
         type: ErrorType.Server,
       });
-      openNotification(detError);
     }
   }, [currentMaxSlotsExceeded]);
 
