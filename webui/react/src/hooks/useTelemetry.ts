@@ -41,7 +41,7 @@ class Telemetry {
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   track(event: string, ...args: any[]) {
-    if (analytics?.track) analytics.track(event, ...args);
+    if (window.analytics?.track) analytics.track(event, ...args);
   }
 
   async load(info: DeterminedInfo): Promise<void> {
