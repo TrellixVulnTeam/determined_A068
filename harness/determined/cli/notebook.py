@@ -30,16 +30,16 @@ def start_notebook(args: Namespace) -> None:
     nb = resp.notebook
     maxCurrentSlotsExceeded = True if resp.maxCurrentSlotsExceeded else False
 
+    if args.detach:
+        print(nb.id)
+        return
+
     if maxCurrentSlotsExceeded:
         warning = (
             "Warning: The requested job requires more slots than currently available. "
             "You may need to increase cluster resources in order for the job to run."
         )
         print(colored(warning, "yellow"))
-
-    if args.detach:
-        print(nb.id)
-        return
 
     with api.ws(args.master, "notebooks/{}/events".format(nb.id)) as ws:
         for msg in ws:
