@@ -24,8 +24,10 @@ class _InteractiveCommandProcess:
         else:
             iterator = iter(self.process.stdout)  # type: ignore
             line = next(iterator)
-            m = re.search(rb"Scheduling .* \(id: (.*)\)", line)
-            assert m is not None
+            m = None
+            while line and not m:
+                m = re.search(rb"Scheduling .* \(id: (.*)\)", line)
+                line = next(iterator)
             self.task_id = m.group(1).decode() if m else None
 
     @property
