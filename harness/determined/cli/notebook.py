@@ -31,7 +31,9 @@ def start_notebook(args: Namespace) -> None:
     warnings = resp.warnings
 
     currentSlotsExceeded = (
-        warnings and bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED in warnings
+        True
+        if (warnings and bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED in warnings)
+        else False
     )
 
     if args.detach:
