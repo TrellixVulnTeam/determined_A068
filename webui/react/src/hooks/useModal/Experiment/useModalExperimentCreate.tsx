@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 import { paths } from 'routes/utils';
 import { createExperiment } from 'services/api';
+import { V1LaunchWarning } from 'services/api-ts-sdk';
 import Icon from 'shared/components/Icon/Icon';
 import Spinner from 'shared/components/Spinner/Spinner';
 import useModal, { ModalHooks as Hooks, ModalCloseReason } from 'shared/hooks/useModal/useModal';
@@ -217,12 +218,15 @@ const useModalExperimentCreate = ({ onClose }: Props = {}): ModalHooks => {
       if (!modalState.experiment || (!isFork && !modalState.trial)) return;
 
       try {
-        const { experiment: newExperiment, maxSlotsExceeded } = await createExperiment({
+        const { experiment: newExperiment, warnings } = await createExperiment({
           activate: true,
           experimentConfig: newConfig,
           parentId: modalState.experiment.id,
           projectId: modalState.experiment.projectId,
         });
+        const maxSlotsExceeded = warnings
+          ? warnings.includes(V1LaunchWarning.MAXCURRENTSLOTSEXCEEDED)
+          : false;
         if (maxSlotsExceeded) {
           handleWarning({
             level: ErrorLevel.Warn,

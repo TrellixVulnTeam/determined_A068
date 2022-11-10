@@ -8,7 +8,7 @@ from termcolor import colored
 from determined import cli
 from determined.cli import command, render, task
 from determined.common import api, context
-from determined.common.api import authentication, bindings, request
+from determined.common.api import authentication, bindings, request, v1LaunchWarning
 from determined.common.check import check_eq
 from determined.common.declarative_argparse import Arg, Cmd, Group
 
@@ -28,7 +28,11 @@ def start_notebook(args: Namespace) -> None:
         return
 
     nb = resp.notebook
-    maxCurrentSlotsExceeded = True if resp.maxCurrentSlotsExceeded else False
+    warnings = resp.warnings
+
+    maxCurrentSlotsExceeded = (
+        warnings and v1LaunchWarning.LAUNCH_WARNING_MAX_CURRENT_SLOTS_EXCEEDED in warnings
+    )
 
     if args.detach:
         print(nb.id)

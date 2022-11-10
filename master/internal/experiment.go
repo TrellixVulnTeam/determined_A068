@@ -26,6 +26,7 @@ import (
 	"github.com/determined-ai/determined/master/internal/telemetry"
 	"github.com/determined-ai/determined/master/internal/webhooks"
 	"github.com/determined-ai/determined/master/pkg/actor"
+	"github.com/determined-ai/determined/master/pkg/command"
 	"github.com/determined-ai/determined/master/pkg/logger"
 	"github.com/determined-ai/determined/master/pkg/model"
 	"github.com/determined-ai/determined/master/pkg/ptrs"
@@ -119,18 +120,18 @@ type (
 // and log. If the input object has no ID set, also create a new experiment in the database and set
 // the returned object's ID appropriately.
 func newExperiment(m *Master, expModel *model.Experiment, taskSpec *tasks.TaskSpec) (
-	*experiment, bool, error,
+	*experiment, []command.LaunchWarning, error,
 ) {
 	conf := &expModel.Config
-
+	var launchWarnings []command.LaunchWarning
 	resources := conf.Resources()
-	resolvedResourcePool, err := m.rm.ResolveResourcePool(
+	poolName, err := m.rm.ResolveResourcePool(
 		m.system, resources.ResourcePool(), resources.SlotsPerTrial(), false,
 	)
 	if err != nil {
-		return nil, false, fmt.Errorf("cannot create an experiment: %w", err)
+		return nil, launchWarnings, fmt.Errorf("cannot create an experiment: %w", err)
 	}
-	poolName := resolvedResourcePool.Name
+	launchWarnings, err = m.rm.GetResourcePoolAvailability(m.system, poolName, resources.SlotsPerTrial())
 	resources.SetResourcePool(poolName)
 	conf.SetResources(resources)
 
@@ -143,19 +144,19 @@ func newExperiment(m *Master, expModel *model.Experiment, taskSpec *tasks.TaskSp
 	checkpoint, err := checkpointFromTrialIDOrUUID(
 		m.db, conf.Searcher().SourceTrialID(), conf.Searcher().SourceCheckpointUUID())
 	if err != nil {
-		return nil, false, err
+		return nil, launchWarnings, err
 	}
 
 	if expModel.ID == 0 {
 		if err = m.db.AddExperiment(expModel); err != nil {
-			return nil, false, err
+			return nil, launchWarnings, err
 		}
 		telemetry.ReportExperimentCreated(m.system, expModel)
 	}
 
 	agentUserGroup, err := user.GetAgentUserGroup(*expModel.OwnerID, expModel)
 	if err != nil {
-		return nil, false, err
+		return nil, launchWarnings, err
 	}
 
 	taskSpec.AgentUserGroup = agentUserGroup
@@ -181,7 +182,7 @@ func newExperiment(m *Master, expModel *model.Experiment, taskSpec *tasks.TaskSp
 			"job-id":        expModel.JobID,
 			"experiment-id": expModel.ID,
 		},
-	}, resolvedResourcePool.CurrentMaxSlotsExceeded, nil
+	}, launchWarnings, nil
 }
 
 func (e *experiment) Receive(ctx *actor.Context) error {
@@ -843,10 +844,9 @@ func (e *experiment) setWeight(ctx *actor.Context, weight float64) error {
 func (e *experiment) setRP(ctx *actor.Context, msg sproto.SetResourcePool) error {
 	resources := e.Config.Resources()
 	oldRP := resources.ResourcePool()
-	resolvedResourcePool, err := e.rm.ResolveResourcePool(
+	rp, err := e.rm.ResolveResourcePool(
 		ctx, msg.ResourcePool, e.Config.Resources().SlotsPerTrial(), false,
 	)
-	rp := resolvedResourcePool.Name
 	switch {
 	case err != nil:
 		return fmt.Errorf("invalid resource pool name %s", msg.ResourcePool)

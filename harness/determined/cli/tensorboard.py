@@ -30,7 +30,7 @@ def start_tensorboard(args: Namespace) -> None:
     req_body["files"] = context.read_legacy_context(args.context, args.include)
 
     api_resp = api.post(args.master, "api/v1/tensorboards", json=req_body).json()
-    maxSlotsExceeded = api_resp["maxCurrentSlotsExceeded"]
+    maxSlotsExceeded = maxSlotsExceeded
     resp = api_resp["tensorboard"]
 
     if args.detach:
@@ -65,7 +65,7 @@ def start_tensorboard(args: Namespace) -> None:
                             resource_pool=resp["resourcePool"],
                             description=resp["description"],
                             task_type="tensorboard",
-                            maxSlotsExceeded=api_resp["maxCurrentSlotsExceeded"],
+                            maxSlotsExceeded=maxSlotsExceeded,
                         ),
                     )
                 print(colored("TensorBoard is running at: {}".format(url), "green"))

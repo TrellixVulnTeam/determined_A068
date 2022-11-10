@@ -25,6 +25,7 @@ import { useFetchResourcePools } from 'hooks/useFetch';
 import { maxPoolSlotCapacity } from 'pages/Clusters/ClustersOverview';
 import { paths } from 'routes/utils';
 import { createExperiment } from 'services/api';
+import { V1LaunchWarning } from 'services/api-ts-sdk';
 import Icon from 'shared/components/Icon';
 import useModal, { ModalHooks as Hooks, ModalCloseReason } from 'shared/hooks/useModal/useModal';
 import { Primitive } from 'shared/types';
@@ -231,7 +232,7 @@ const useModalHyperparameterSearch = ({
     const newConfig = yaml.dump(baseConfig);
 
     try {
-      const { experiment: newExperiment, maxSlotsExceeded } = await createExperiment(
+      const { experiment: newExperiment, warnings } = await createExperiment(
         {
           activate: true,
           experimentConfig: newConfig,
@@ -240,7 +241,9 @@ const useModalHyperparameterSearch = ({
         },
         { signal: canceler.current?.signal },
       );
-
+      const maxSlotsExceeded = warnings
+        ? warnings.includes(V1LaunchWarning.MAXCURRENTSLOTSEXCEEDED)
+        : false;
       if (maxSlotsExceeded) {
         handleWarning({
           level: ErrorLevel.Warn,

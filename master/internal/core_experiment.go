@@ -471,12 +471,11 @@ func (m *Master) parseCreateExperiment(params *CreateExperimentParams, user *mod
 
 	defaulted := schemas.WithDefaults(config).(expconf.ExperimentConfig)
 	resources := defaulted.Resources()
-	resolvedResourcePool, err := m.rm.ResolveResourcePool(
+	poolName, err := m.rm.ResolveResourcePool(
 		m.system, resources.ResourcePool(), resources.SlotsPerTrial(), false)
 	if err != nil {
 		return nil, nil, false, nil, errors.Wrapf(err, "invalid resource configuration")
 	}
-	poolName := resolvedResourcePool.Name
 	taskContainerDefaults := m.getTaskContainerDefaults(poolName)
 	taskSpec := *m.taskSpec
 	taskSpec.TaskContainerDefaults = taskContainerDefaults
@@ -597,7 +596,7 @@ func (m *Master) postExperiment(c echo.Context) (interface{}, error) {
 		}
 	}
 
-	e, maxSlotsExceeded, err := newExperiment(m, dbExp, taskSpec)
+	e, launchWarnings, err := newExperiment(m, dbExp, taskSpec)
 	if err != nil {
 		return nil, errors.Wrap(err, "starting experiment")
 	}
@@ -621,11 +620,11 @@ func (m *Master) postExperiment(c echo.Context) (interface{}, error) {
 
 	c.Response().Header().Set(echo.HeaderLocation, fmt.Sprintf("/experiments/%v", e.ID))
 	response := model.ExperimentDescriptor{
-		ID:                      e.ID,
-		Archived:                false,
-		Config:                  config,
-		Labels:                  make([]string, 0),
-		MaxCurrentSlotsExceeded: maxSlotsExceeded,
+		ID:       e.ID,
+		Archived: false,
+		Config:   config,
+		Labels:   make([]string, 0),
+		Warnings: launchWarnings,
 	}
 	return response, nil
 }

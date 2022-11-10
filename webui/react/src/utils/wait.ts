@@ -1,5 +1,6 @@
 import { serverAddress } from 'routes/utils';
 import { paths } from 'routes/utils';
+import { V1LaunchWarning } from 'services/api-ts-sdk';
 import { openBlank } from 'shared/utils/routes';
 import { Command, CommandResponse, CommandState, CommandTask, CommandType } from 'types';
 import { isCommandTask } from 'utils/task';
@@ -29,11 +30,10 @@ export const openCommand = (command: CommandTask): void => {
 };
 
 export const openCommandResponse = (commandResponse: CommandResponse): void => {
+  const warnings = commandResponse?.warnings ? commandResponse.warnings : [];
+  const maxSlotsExceeded = warnings.includes(V1LaunchWarning.MAXCURRENTSLOTSEXCEEDED);
   openBlank(
-    `${process.env.PUBLIC_URL}${paths.interactive(
-      commandResponse.command,
-      commandResponse.maxSlotsExceeded,
-    )}`,
+    `${process.env.PUBLIC_URL}${paths.interactive(commandResponse.command, maxSlotsExceeded)}`,
   );
 };
 

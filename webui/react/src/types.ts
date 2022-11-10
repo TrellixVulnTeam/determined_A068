@@ -1,5 +1,5 @@
 import * as Api from 'services/api-ts-sdk';
-import { V1Group, V1Trigger } from 'services/api-ts-sdk';
+import { V1Group, V1LaunchWarning, V1Trigger } from 'services/api-ts-sdk';
 import { Primitive, RawJson, RecordKey, ValueOf } from 'shared/types';
 
 interface WithPagination {
@@ -567,7 +567,7 @@ export interface ProjectExperiment extends ExperimentItem {
 
 export interface CreateExperimentResponse {
   experiment: ExperimentBase;
-  maxSlotsExceeded: boolean;
+  warnings?: V1LaunchWarning[];
 }
 
 export interface ExperimentBase extends ProjectExperiment {
@@ -667,7 +667,7 @@ export interface ExperimentTask extends Task {
 
 export interface CommandResponse {
   command: CommandTask;
-  maxSlotsExceeded?: boolean;
+  warnings?: V1LaunchWarning[];
 }
 
 export interface CommandTask extends Task {

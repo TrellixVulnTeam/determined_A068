@@ -3,6 +3,7 @@ package rm
 import (
 	"github.com/determined-ai/determined/master/internal/sproto"
 	"github.com/determined-ai/determined/master/pkg/actor"
+	"github.com/determined-ai/determined/master/pkg/command"
 	"github.com/determined-ai/determined/master/pkg/model"
 	"github.com/determined-ai/determined/proto/pkg/apiv1"
 	"github.com/determined-ai/determined/proto/pkg/jobv1"
@@ -57,7 +58,11 @@ type ResourceManager interface {
 		ctx actor.Messenger,
 		name string,
 		slots int,
-		command bool) (ResolvedResourcePool, error)
+		command bool) (string, error)
+	GetResourcePoolAvailability(
+		ctx actor.Messenger,
+		name string,
+		slots int) ([]command.LaunchWarning, error)
 
 	// Agents
 	GetAgents(actor.Messenger, *apiv1.GetAgentsRequest) (*apiv1.GetAgentsResponse, error)

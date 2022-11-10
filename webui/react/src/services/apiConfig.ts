@@ -622,7 +622,7 @@ export const createExperiment: DetApi<
   postProcess: (resp: Api.V1CreateExperimentResponse) => {
     return {
       experiment: decoder.mapV1GetExperimentDetailsResponse(resp),
-      maxSlotsExceeded: resp.maxCurrentSlotsExceeded || false,
+      warnings: resp.warnings || [],
     };
   },
   request: (params: Service.CreateExperimentParams, options) => {
@@ -1561,7 +1561,7 @@ export const launchJupyterLab: DetApi<
   postProcess: (response) => {
     return {
       command: decoder.mapV1Notebook(response.notebook),
-      maxSlotsExceeded: response.maxCurrentSlotsExceeded,
+      warnings: response.warnings || [],
     };
   },
   request: (params: Service.LaunchJupyterLabParams) => detApi.Notebooks.launchNotebook(params),
@@ -1586,7 +1586,7 @@ export const launchTensorBoard: DetApi<
   postProcess: (response) => {
     return {
       command: decoder.mapV1TensorBoard(response.tensorboard),
-      maxSlotsExceeded: response.maxCurrentSlotsExceeded,
+      wanrings: response.warnings || [],
     };
   },
   request: (params: Service.LaunchTensorBoardParams) =>

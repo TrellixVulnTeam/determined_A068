@@ -75,7 +75,7 @@ func (m *Master) restoreExperiment(expModel *model.Experiment) error {
 		)
 	}
 
-	resolvedResourcePool, err := m.rm.ResolveResourcePool(
+	poolName, err := m.rm.ResolveResourcePool(
 		m.system,
 		expModel.Config.Resources().ResourcePool(),
 		expModel.Config.Resources().SlotsPerTrial(),
@@ -84,7 +84,6 @@ func (m *Master) restoreExperiment(expModel *model.Experiment) error {
 	if err != nil {
 		return fmt.Errorf("invalid resource configuration: %w", err)
 	}
-	poolName := resolvedResourcePool.Name
 	taskContainerDefaults := m.getTaskContainerDefaults(poolName)
 	taskSpec := *m.taskSpec
 	taskSpec.TaskContainerDefaults = taskContainerDefaults

@@ -12,8 +12,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 
-	"github.com/determined-ai/determined/master/pkg/schemas/expconf"
-
 	"github.com/determined-ai/determined/master/internal/config"
 	"github.com/determined-ai/determined/master/internal/db"
 	"github.com/determined-ai/determined/master/internal/rm/kubernetes"
@@ -21,10 +19,12 @@ import (
 	"github.com/determined-ai/determined/master/pkg/actor"
 	"github.com/determined-ai/determined/master/pkg/actor/actors"
 	"github.com/determined-ai/determined/master/pkg/aproto"
+	"github.com/determined-ai/determined/master/pkg/command"
 	"github.com/determined-ai/determined/master/pkg/cproto"
 	"github.com/determined-ai/determined/master/pkg/device"
 	"github.com/determined-ai/determined/master/pkg/logger"
 	"github.com/determined-ai/determined/master/pkg/model"
+	"github.com/determined-ai/determined/master/pkg/schemas/expconf"
 	"github.com/determined-ai/determined/master/pkg/tasks"
 	"github.com/determined-ai/determined/proto/pkg/apiv1"
 	"github.com/determined-ai/determined/proto/pkg/resourcepoolv1"
@@ -84,8 +84,8 @@ func (k KubernetesResourceManager) ResolveResourcePool(
 	name string,
 	slots int,
 	command bool,
-) (ResolvedResourcePool, error) {
-	return ResolvedResourcePool{Name: KubernetesDummyResourcePool}, k.ValidateResourcePool(ctx, name)
+) (string, error) {
+	return KubernetesDummyResourcePool, k.ValidateResourcePool(ctx, name)
 }
 
 // ValidateResourcePool validates a resource pool is none or the k8s dummy pool.
@@ -94,6 +94,18 @@ func (k KubernetesResourceManager) ValidateResourcePool(ctx actor.Messenger, nam
 		return fmt.Errorf("k8s doesn't not support resource pools")
 	}
 	return nil
+}
+
+// GetResourcePoolAvailability checks the available resources for a given pool.
+func (k KubernetesResourceManager) GetResourcePoolAvailability(ctx actor.Messenger, name string, slots int) ([]command.LaunchWarning, error) {
+	launchWarnings := []command.LaunchWarning{}
+	if slots == 0 {
+		return launchWarnings, nil
+	}
+	if name != "" && name != KubernetesDummyResourcePool {
+		return launchWarnings, fmt.Errorf("k8s doesn't not support resource pools")
+	}
+	return launchWarnings, nil
 }
 
 // GetDefaultComputeResourcePool requests the default compute resource pool.

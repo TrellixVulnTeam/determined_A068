@@ -17,6 +17,7 @@ import (
 	"github.com/determined-ai/determined/master/internal/db"
 	"github.com/determined-ai/determined/master/internal/sproto"
 	"github.com/determined-ai/determined/master/pkg/actor"
+	"github.com/determined-ai/determined/master/pkg/command"
 	"github.com/determined-ai/determined/master/pkg/device"
 	"github.com/determined-ai/determined/proto/pkg/apiv1"
 	"github.com/determined-ai/determined/proto/pkg/jobv1"
@@ -31,12 +32,6 @@ const (
 // AgentResourceManager is a resource manager for Determined-managed resources.
 type AgentResourceManager struct {
 	*ActorResourceManager
-}
-
-// ResolvedResourcePool represents the result of validating a resource pool.
-type ResolvedResourcePool struct {
-	Name                    string
-	CurrentMaxSlotsExceeded bool
 }
 
 // NewAgentResourceManager returns a new AgentResourceManager, which manages communicating with
@@ -126,58 +121,60 @@ func (a AgentResourceManager) CheckMaxSlotsExceeded(
 // ResolveResourcePool fully resolves the resource pool name.
 func (a AgentResourceManager) ResolveResourcePool(
 	ctx actor.Messenger, name string, slots int, command bool,
-) (ResolvedResourcePool, error) {
-	var rp ResolvedResourcePool
+) (string, error) {
 	// If the resource pool isn't set, fill in the default at creation time.
 	if name == "" && slots == 0 {
 		req := sproto.GetDefaultAuxResourcePoolRequest{}
 		resp, err := a.GetDefaultAuxResourcePool(ctx, req)
 		if err != nil {
-			return rp, fmt.Errorf("defaulting to aux pool: %w", err)
+			return resp.PoolName, fmt.Errorf("defaulting to aux pool: %w", err)
 		}
-		rp.Name = resp.PoolName
-		return rp, nil
+		return resp.PoolName, nil
 	}
 
 	if name == "" && slots >= 0 {
 		req := sproto.GetDefaultComputeResourcePoolRequest{}
 		resp, err := a.GetDefaultComputeResourcePool(ctx, req)
 		if err != nil {
-			return rp, fmt.Errorf("defaulting to compute pool: %w", err)
+			return name, fmt.Errorf("defaulting to compute pool: %w", err)
 		}
-		currentMaxSlotsExceeded, err := a.CheckMaxSlotsExceeded(ctx, name, slots)
-		if err != nil {
-			return rp, fmt.Errorf("validating request for (%s, %d): %w", name, slots, err)
-		}
-		rp.Name = resp.PoolName
-		rp.CurrentMaxSlotsExceeded = currentMaxSlotsExceeded
-		return rp, nil
+		return resp.PoolName, nil
 	}
 
 	if err := a.ValidateResourcePool(ctx, name); err != nil {
-		return rp, fmt.Errorf("validating pool: %w", err)
+		return name, fmt.Errorf("validating pool: %w", err)
 	}
-	if slots > 0 {
+	if slots > 0 && command {
 		switch resp, err := a.ValidateCommandResources(ctx, sproto.ValidateCommandResourcesRequest{
 			ResourcePool: name,
 			Slots:        slots,
 		}); {
 		case err != nil:
-			return rp, fmt.Errorf("validating request for (%s, %d): %w", name, slots, err)
+			return name, fmt.Errorf("validating request for (%s, %d): %w", name, slots, err)
 		case !resp.Fulfillable:
-			return rp, errors.New("request unfulfillable, please try requesting less slots")
-		default:
-			rp.Name = name
-			currentMaxSlotsExceeded, err := a.CheckMaxSlotsExceeded(ctx, name, slots)
-			if err != nil {
-				return rp, fmt.Errorf("validating request for (%s, %d): %w", name, slots, err)
-			}
-			rp.CurrentMaxSlotsExceeded = currentMaxSlotsExceeded
-			return rp, nil
+			return name, errors.New("request unfulfillable, please try requesting less slots")
 		}
 	}
-	rp.Name = name
-	return rp, nil
+	return name, nil
+}
+
+// GetResourcePoolAvailability is a default implementation to satisfy the interface, mostly for tests.
+func (a AgentResourceManager) GetResourcePoolAvailability(ctx actor.Messenger, name string, slots int) (
+	[]command.LaunchWarning,
+	error,
+) {
+	launchWarnings := []command.LaunchWarning{}
+	if slots == 0 {
+		return launchWarnings, nil
+	}
+	currentMaxSlotsExceeded, err := a.CheckMaxSlotsExceeded(ctx, name, slots)
+	if err != nil {
+		return launchWarnings, fmt.Errorf("validating request for (%s, %d): %w", name, slots, err)
+	}
+	if currentMaxSlotsExceeded {
+		launchWarnings = append(launchWarnings, command.MAX_CURRENT_SLOTS_EXCEEDED)
+	}
+	return launchWarnings, nil
 }
 
 // GetAgents gets the state of connected agents. Go around the RM and directly to the agents actor
