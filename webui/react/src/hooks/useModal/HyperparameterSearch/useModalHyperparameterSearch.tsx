@@ -242,7 +242,7 @@ const useModalHyperparameterSearch = ({
         { signal: canceler.current?.signal },
       );
       const maxSlotsExceeded = warnings
-        ? warnings.includes(V1LaunchWarning.MAXCURRENTSLOTSEXCEEDED)
+        ? warnings.includes(V1LaunchWarning.CURRENTSLOTSEXCEEDED)
         : false;
       if (maxSlotsExceeded) {
         handleWarning({

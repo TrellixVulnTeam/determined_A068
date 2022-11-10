@@ -225,7 +225,7 @@ const useModalExperimentCreate = ({ onClose }: Props = {}): ModalHooks => {
           projectId: modalState.experiment.projectId,
         });
         const maxSlotsExceeded = warnings
-          ? warnings.includes(V1LaunchWarning.MAXCURRENTSLOTSEXCEEDED)
+          ? warnings.includes(V1LaunchWarning.CURRENTSLOTSEXCEEDED)
           : false;
         if (maxSlotsExceeded) {
           handleWarning({

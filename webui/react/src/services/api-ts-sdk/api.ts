@@ -4623,13 +4623,13 @@ export interface V1LaunchTensorboardResponse {
 }
 
 /**
- * Enum values for warnings when launching commands.   - LAUNCH_WARNING_UNSPECIFIED: Default value  - LAUNCH_WARNING_MAX_CURRENT_SLOTS_EXCEEDED: For a default webhook
+ * Enum values for warnings when launching commands.   - LAUNCH_WARNING_UNSPECIFIED: Default value  - LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED: For a default webhook
  * @export
  * @enum {string}
  */
 export enum V1LaunchWarning {
     UNSPECIFIED = <any> 'LAUNCH_WARNING_UNSPECIFIED',
-    MAXCURRENTSLOTSEXCEEDED = <any> 'LAUNCH_WARNING_MAX_CURRENT_SLOTS_EXCEEDED'
+    CURRENTSLOTSEXCEEDED = <any> 'LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED'
 }
 
 /**

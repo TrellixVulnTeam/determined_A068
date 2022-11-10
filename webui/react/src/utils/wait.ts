@@ -31,7 +31,7 @@ export const openCommand = (command: CommandTask): void => {
 
 export const openCommandResponse = (commandResponse: CommandResponse): void => {
   const warnings = commandResponse?.warnings ? commandResponse.warnings : [];
-  const maxSlotsExceeded = warnings.includes(V1LaunchWarning.MAXCURRENTSLOTSEXCEEDED);
+  const maxSlotsExceeded = warnings.includes(V1LaunchWarning.CURRENTSLOTSEXCEEDED);
   openBlank(
     `${process.env.PUBLIC_URL}${paths.interactive(commandResponse.command, maxSlotsExceeded)}`,
   );

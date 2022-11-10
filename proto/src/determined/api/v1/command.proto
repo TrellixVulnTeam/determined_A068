@@ -100,7 +100,7 @@ enum LaunchWarning {
   // Default value
   LAUNCH_WARNING_UNSPECIFIED = 0;
   // For a default webhook
-  LAUNCH_WARNING_MAX_CURRENT_SLOTS_EXCEEDED = 1;
+  LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED = 1;
 }
 
 // Response to LaunchCommandRequest.
