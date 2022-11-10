@@ -30,7 +30,7 @@ def start_notebook(args: Namespace) -> None:
     nb = resp.notebook
     warnings = resp.warnings
 
-    maxCurrentSlotsExceeded = (
+    currentSlotsExceeded = (
         warnings and bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED in warnings
     )
 
@@ -38,7 +38,7 @@ def start_notebook(args: Namespace) -> None:
         print(nb.id)
         return
 
-    if maxCurrentSlotsExceeded:
+    if currentSlotsExceeded:
         warning = (
             "Warning: The requested job requires more slots than currently available. "
             "You may need to increase cluster resources in order for the job to run."
@@ -56,7 +56,7 @@ def start_notebook(args: Namespace) -> None:
                         description=nb.description,
                         resource_pool=nb.resourcePool,
                         task_type="notebook",
-                        maxSlotsExceeded=maxCurrentSlotsExceeded,
+                        maxSlotsExceeded=currentSlotsExceeded,
                     ),
                 )
                 print(colored("Jupyter Notebook is running at: {}".format(url), "green"))

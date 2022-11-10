@@ -68,7 +68,7 @@ def start_tensorboard(args: Namespace) -> None:
                             resource_pool=resp["resourcePool"],
                             description=resp["description"],
                             task_type="tensorboard",
-                            maxSlotsExceeded=maxSlotsExceeded,
+                            maxSlotsExceeded=currentSlotsExceeded,
                         ),
                     )
                 print(colored("TensorBoard is running at: {}".format(url), "green"))
