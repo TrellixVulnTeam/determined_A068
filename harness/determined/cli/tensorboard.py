@@ -9,7 +9,7 @@ from termcolor import colored
 from determined import cli
 from determined.cli import command, task
 from determined.common import api, context
-from determined.common.api import authentication, request
+from determined.common.api import authentication, bindings, request
 from determined.common.check import check_eq
 from determined.common.declarative_argparse import Arg, Cmd, Group
 
@@ -30,14 +30,17 @@ def start_tensorboard(args: Namespace) -> None:
     req_body["files"] = context.read_legacy_context(args.context, args.include)
 
     api_resp = api.post(args.master, "api/v1/tensorboards", json=req_body).json()
-    maxSlotsExceeded = maxSlotsExceeded
-    resp = api_resp["tensorboard"]
 
+    resp = api_resp["tensorboard"]
+    warnings = api_resp.get("warnings")
+
+    currentSlotsExceeded = warnings and bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED in warnings
+    
     if args.detach:
         print(resp["id"])
         return
 
-    if maxSlotsExceeded:
+    if currentSlotsExceeded:
         warning = (
             "Warning: The requested job requires more slots than currently available."
             "You may need to increase cluster resources in order for the job to run."
