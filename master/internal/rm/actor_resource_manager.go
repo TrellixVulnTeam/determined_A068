@@ -49,8 +49,11 @@ func (r *ActorResourceManager) ValidateResources(
 	return nil
 }
 
-// GetResourcePoolAvailability is a default implementation to satisfy the interface, mostly for tests.
-func (r *ActorResourceManager) GetResourcePoolAvailability(ctx actor.Messenger, name string, slots int) (
+// GetResourcePoolAvailability is a default implementation to satisfy the interface.
+func (r *ActorResourceManager) GetResourcePoolAvailability(
+	ctx actor.Messenger,
+	name string,
+	slots int) (
 	[]command.LaunchWarning,
 	error,
 ) {
@@ -59,7 +62,9 @@ func (r *ActorResourceManager) GetResourcePoolAvailability(ctx actor.Messenger, 
 }
 
 // ValidateResourcePool is a default implementation to satisfy the interface, mostly for tests.
-func (r *ActorResourceManager) ValidateResourcePool(ctx actor.Messenger, name string) error {
+func (r *ActorResourceManager) ValidateResourcePool(
+	ctx actor.Messenger,
+	name string) error {
 	return nil
 }
 

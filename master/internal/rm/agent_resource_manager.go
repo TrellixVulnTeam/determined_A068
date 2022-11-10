@@ -152,10 +152,11 @@ func (a AgentResourceManager) ValidateResources(
 	ctx actor.Messenger, name string, slots int, command bool,
 ) error {
 	if slots > 0 && command {
-		switch resp, err := a.ValidateCommandResources(ctx, sproto.ValidateCommandResourcesRequest{
-			ResourcePool: name,
-			Slots:        slots,
-		}); {
+		switch resp, err := a.ValidateCommandResources(ctx,
+			sproto.ValidateCommandResourcesRequest{
+				ResourcePool: name,
+				Slots:        slots,
+			}); {
 		case err != nil:
 			return fmt.Errorf("validating request for (%s, %d): %w", name, slots, err)
 		case !resp.Fulfillable:
@@ -165,8 +166,9 @@ func (a AgentResourceManager) ValidateResources(
 	return nil
 }
 
-// GetResourcePoolAvailability is a default implementation to satisfy the interface, mostly for tests.
-func (a AgentResourceManager) GetResourcePoolAvailability(ctx actor.Messenger, name string, slots int) (
+// GetResourcePoolAvailability is a default implementation to satisfy the interface.
+func (a AgentResourceManager) GetResourcePoolAvailability(ctx actor.Messenger,
+	name string, slots int) (
 	[]command.LaunchWarning,
 	error,
 ) {
@@ -179,7 +181,7 @@ func (a AgentResourceManager) GetResourcePoolAvailability(ctx actor.Messenger, n
 		return launchWarnings, fmt.Errorf("validating request for (%s, %d): %w", name, slots, err)
 	}
 	if currentMaxSlotsExceeded {
-		launchWarnings = append(launchWarnings, command.MAX_CURRENT_SLOTS_EXCEEDED)
+		launchWarnings = append(launchWarnings, command.CurrentSlotsExceeded)
 	}
 	return launchWarnings, nil
 }

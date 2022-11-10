@@ -87,7 +87,7 @@ func (k KubernetesResourceManager) ResolveResourcePool(
 	return KubernetesDummyResourcePool, k.ValidateResourcePool(ctx, name)
 }
 
-// ResolveResourcePool resolves the resource pool completely.
+// ValidateResources ensures enough resources are available in the resource pool.
 func (k KubernetesResourceManager) ValidateResources(
 	ctx actor.Messenger,
 	name string,
@@ -106,7 +106,10 @@ func (k KubernetesResourceManager) ValidateResourcePool(ctx actor.Messenger, nam
 }
 
 // GetResourcePoolAvailability checks the available resources for a given pool.
-func (k KubernetesResourceManager) GetResourcePoolAvailability(ctx actor.Messenger, name string, slots int) ([]command.LaunchWarning, error) {
+func (k KubernetesResourceManager) GetResourcePoolAvailability(
+	ctx actor.Messenger,
+	name string,
+	slots int) ([]command.LaunchWarning, error) {
 	launchWarnings := []command.LaunchWarning{}
 	if slots == 0 {
 		return launchWarnings, nil

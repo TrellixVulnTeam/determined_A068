@@ -83,7 +83,11 @@ func (m *Master) restoreExperiment(expModel *model.Experiment) error {
 	if err != nil {
 		return fmt.Errorf("invalid resource configuration: %w", err)
 	}
-	if err = m.rm.ValidateResources(m.system, poolName, expModel.Config.Resources().SlotsPerTrial(), false); err != nil {
+	if err = m.rm.ValidateResources(
+		m.system,
+		poolName,
+		expModel.Config.Resources().SlotsPerTrial(),
+		false); err != nil {
 		return fmt.Errorf("validating resources: %v", err)
 	}
 	taskContainerDefaults := m.getTaskContainerDefaults(poolName)

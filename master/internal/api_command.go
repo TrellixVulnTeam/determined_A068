@@ -61,7 +61,9 @@ func (a *apiServer) getCommandLaunchParams(ctx context.Context, req *protoComman
 	// Validate the userModel and get the agent userModel group.
 	userModel, _, err := grpcutil.GetUser(ctx)
 	if err != nil {
-		return nil, launchWarnings, status.Errorf(codes.Unauthenticated, "failed to get the user: %s", err)
+		return nil,
+			launchWarnings,
+			status.Errorf(codes.Unauthenticated, "failed to get the user: %s", err)
 	}
 
 	// TODO(ilia): When commands are workspaced, also use workspace AgentUserGroup here.
