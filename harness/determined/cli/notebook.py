@@ -56,7 +56,7 @@ def start_notebook(args: Namespace) -> None:
                         description=nb.description,
                         resource_pool=nb.resourcePool,
                         task_type="notebook",
-                        maxSlotsExceeded=currentSlotsExceeded,
+                        currentSlotsExceeded=currentSlotsExceeded,
                     ),
                 )
                 print(colored("Jupyter Notebook is running at: {}".format(url), "green"))
@@ -77,7 +77,7 @@ def open_notebook(args: Namespace) -> None:
             description=resp["description"],
             resource_pool=resp["resourcePool"],
             task_type="notebook",
-            maxSlotsExceeded=False,
+            currentSlotsExceeded=False,
         ),
     )
 

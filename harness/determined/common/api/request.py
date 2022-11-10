@@ -49,7 +49,7 @@ def make_interactive_task_url(
     description: str,
     resource_pool: str,
     task_type: str,
-    maxSlotsExceeded: bool,
+    currentSlotsExceeded: bool,
 ) -> str:
     wait_path = (
         "/notebooks/{}/events".format(task_id)
@@ -68,7 +68,7 @@ def make_interactive_task_url(
         parse.quote(description),
         resource_pool,
         parse.quote_plus(wait_page_url),
-        str(maxSlotsExceeded).lower(),
+        str(currentSlotsExceeded).lower(),
     )
     return task_web_url
 
