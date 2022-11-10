@@ -45,6 +45,9 @@ parameters:
   gke-version:
     type: string
     default: "1.21.14"
+  master-build-resource-class:
+    type: string
+    default: large
 
 release-and-rc-filters: &release-and-rc-filters
   branches:
@@ -666,6 +669,8 @@ commands:
         type: string
       num-machines:
         type: integer
+      labels:
+        type: string
       gpu-type:
         type: string
       gpus-per-machine:
@@ -693,6 +698,8 @@ commands:
     steps:
       - set-cluster-id:
           cluster-id: <<parameters.cluster-id>>
+      - set-cluster-labels:
+          labels: <<parameters.labels>>
       - gcloud/install:
           version: "319.0.0"
       - kubernetes/install-kubectl
@@ -701,7 +708,7 @@ commands:
           google-compute-zone: <<parameters.google-compute-zone>>
           google-project-id: <<parameters.google-project-id>>
       - run:
-          command: gcloud container clusters create ${CLUSTER_ID} --machine-type=n1-standard-8 --cluster-version=<<parameters.gke-version>> --region=<<parameters.region>> --node-locations=<<parameters.node-locations>> --scopes storage-rw,cloud-platform --num-nodes 1 --labels environment=ci --no-enable-ip-alias --subnetwork default
+          command: gcloud container clusters create ${CLUSTER_ID} --machine-type=n1-standard-8 --cluster-version=<<parameters.gke-version>> --region=<<parameters.region>> --node-locations=<<parameters.node-locations>> --scopes storage-rw,cloud-platform --num-nodes 1 --labels environment=ci,${LABELS} --no-enable-ip-alias --subnetwork default
           name: Create GKE cluster
           no_output_timeout: 30m
       - run:
@@ -768,6 +775,8 @@ commands:
         type: string
       num-machines:
         type: integer
+      labels:
+        type: string
       gpu-type:
         type: string
       gpus-per-machine:
@@ -794,6 +803,8 @@ commands:
     steps:
       - set-cluster-id:
           cluster-id: <<parameters.cluster-id>>
+      - set-cluster-labels:
+          labels: <<parameters.labels>>
       - gcloud/install:
           version: "319.0.0"
       - kubernetes/install-kubectl
@@ -888,6 +899,13 @@ commands:
         type: string
     steps:
       - run: echo "export CLUSTER_ID=\"<<parameters.cluster-id>>\"" >> $BASH_ENV
+
+  set-cluster-labels:
+    parameters:
+      labels:
+        type: string
+    steps:
+      - run: echo "export LABELS=\"$(echo '<<parameters.labels>>' | sed 's/ /-/g')\"" >> $BASH_ENV
 
   wait-for-master:
     parameters:
@@ -1065,7 +1083,7 @@ jobs:
       - attach_workspace:
           at: .
       - setup_remote_docker:
-          version: 19.03.12
+          version: 20.10.18
       - pre-package-and-push-system:
           check: false
       - run: make package
@@ -1086,13 +1104,13 @@ jobs:
       - image: cimg/go:1.18
         environment:
           GO111MODULE: "on"
-    resource_class: medium+
+    resource_class: <<pipeline.parameters.master-build-resource-class>>
     steps:
       - checkout
       - attach_workspace:
           at: .
       - setup_remote_docker:
-          version: 19.03.12
+          version: 20.10.18
       - login-docker:
           username: ${DOCKER_USER}
           password: ${DOCKER_PASS}
@@ -1125,13 +1143,13 @@ jobs:
       - image: cimg/go:1.18
         environment:
           GO111MODULE: "on"
-    resource_class: medium+
+    resource_class: <<pipeline.parameters.master-build-resource-class>>
     steps:
       - checkout
       - attach_workspace:
           at: .
       - setup_remote_docker:
-          version: 19.03.12
+          version: 20.10.18
       - login-docker:
           username: ${DOCKER_USER}
           password: ${DOCKER_PASS}
@@ -1155,13 +1173,13 @@ jobs:
       - image: cimg/go:1.18
         environment:
           GO111MODULE: "on"
-    resource_class: medium+
+    resource_class: <<pipeline.parameters.master-build-resource-class>>
     steps:
       - checkout
       - attach_workspace:
           at: .
       - setup_remote_docker:
-          version: 19.03.12
+          version: 20.10.18
       - login-docker:
           username: ${DOCKER_USER}
           password: ${DOCKER_PASS}
@@ -1976,6 +1994,7 @@ jobs:
           executor: <<pipeline.parameters.docker-image>>
       - setup-gke-cluster:
           cluster-id: <<parameters.cluster-id-prefix>>-$(git rev-parse --short HEAD)-${CIRCLE_BUILD_NUM}-${CIRCLE_NODE_INDEX}
+          labels: test-mark=<<parameters.mark>>
           det-version: ${CIRCLE_SHA1}
           gke-version: <<parameters.gke-version>>
           machine-type: <<parameters.machine-type>>
@@ -2063,6 +2082,7 @@ jobs:
           executor: <<pipeline.parameters.docker-image>>
       - setup-gke-cluster-cuda-11:
           cluster-id: <<parameters.cluster-id-prefix>>-$(git rev-parse --short HEAD)-${CIRCLE_BUILD_NUM}-${CIRCLE_NODE_INDEX}
+          labels: test-mark=<<parameters.mark>>
           det-version: ${CIRCLE_SHA1}
           gke-version: <<parameters.gke-version>>
           machine-type: <<parameters.machine-type>>
@@ -2205,7 +2225,8 @@ workflows:
 
   test-intg:
     jobs:
-      - test-intg-downstream
+      # https://determined-ai.slack.com/archives/C03H5KZPU30/p1667241463073989
+      # - test-intg-downstream
       - test-intg-master:
           context: storage-unit-tests
       - test-intg-agent
@@ -2283,10 +2304,10 @@ workflows:
           parallelism: 1
           tf1: false
           tf2: true
-          devcluster-config: strict-ntsc.devcluster.yaml          
+          devcluster-config: strict-ntsc.devcluster.yaml
           mark: test_strict_ntsc
           target-stage: agent2
-          
+
       - test-e2e:
           name: test-e2e-managed-devcluster
           requires:
