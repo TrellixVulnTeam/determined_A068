@@ -472,9 +472,12 @@ func (m *Master) parseCreateExperiment(params *CreateExperimentParams, user *mod
 	defaulted := schemas.WithDefaults(config).(expconf.ExperimentConfig)
 	resources := defaulted.Resources()
 	poolName, err := m.rm.ResolveResourcePool(
-		m.system, resources.ResourcePool(), resources.SlotsPerTrial(), false)
+		m.system, resources.ResourcePool(), resources.SlotsPerTrial())
 	if err != nil {
 		return nil, nil, false, nil, errors.Wrapf(err, "invalid resource configuration")
+	}
+	if err = m.rm.ValidateResources(m.system, poolName, resources.SlotsPerTrial(), false); err != nil {
+		return nil, nil, false, nil, errors.Wrapf(err, "error validating resources")
 	}
 	taskContainerDefaults := m.getTaskContainerDefaults(poolName)
 	taskSpec := *m.taskSpec

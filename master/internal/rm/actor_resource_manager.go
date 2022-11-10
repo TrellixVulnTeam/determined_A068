@@ -35,9 +35,18 @@ func (r *ActorResourceManager) ResolveResourcePool(
 	ctx actor.Messenger,
 	name string,
 	slots int,
-	command bool,
 ) (string, error) {
 	return name, nil
+}
+
+// ValidateResources is a default implementation to satisfy the interface, mostly for tests.
+func (r *ActorResourceManager) ValidateResources(
+	ctx actor.Messenger,
+	name string,
+	slots int,
+	command bool,
+) error {
+	return nil
 }
 
 // GetResourcePoolAvailability is a default implementation to satisfy the interface, mostly for tests.

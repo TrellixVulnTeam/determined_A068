@@ -120,7 +120,7 @@ func (a AgentResourceManager) CheckMaxSlotsExceeded(
 
 // ResolveResourcePool fully resolves the resource pool name.
 func (a AgentResourceManager) ResolveResourcePool(
-	ctx actor.Messenger, name string, slots int, command bool,
+	ctx actor.Messenger, name string, slots int,
 ) (string, error) {
 	// If the resource pool isn't set, fill in the default at creation time.
 	if name == "" && slots == 0 {
@@ -144,18 +144,25 @@ func (a AgentResourceManager) ResolveResourcePool(
 	if err := a.ValidateResourcePool(ctx, name); err != nil {
 		return name, fmt.Errorf("validating pool: %w", err)
 	}
+	return name, nil
+}
+
+// ValidateResources ensures enough resources are available for a command.
+func (a AgentResourceManager) ValidateResources(
+	ctx actor.Messenger, name string, slots int, command bool,
+) error {
 	if slots > 0 && command {
 		switch resp, err := a.ValidateCommandResources(ctx, sproto.ValidateCommandResourcesRequest{
 			ResourcePool: name,
 			Slots:        slots,
 		}); {
 		case err != nil:
-			return name, fmt.Errorf("validating request for (%s, %d): %w", name, slots, err)
+			return fmt.Errorf("validating request for (%s, %d): %w", name, slots, err)
 		case !resp.Fulfillable:
-			return name, errors.New("request unfulfillable, please try requesting less slots")
+			return errors.New("request unfulfillable, please try requesting less slots")
 		}
 	}
-	return name, nil
+	return nil
 }
 
 // GetResourcePoolAvailability is a default implementation to satisfy the interface, mostly for tests.

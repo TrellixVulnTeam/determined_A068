@@ -83,9 +83,18 @@ func (k KubernetesResourceManager) ResolveResourcePool(
 	ctx actor.Messenger,
 	name string,
 	slots int,
-	command bool,
 ) (string, error) {
 	return KubernetesDummyResourcePool, k.ValidateResourcePool(ctx, name)
+}
+
+// ResolveResourcePool resolves the resource pool completely.
+func (k KubernetesResourceManager) ValidateResources(
+	ctx actor.Messenger,
+	name string,
+	slots int,
+	command bool,
+) error {
+	return nil
 }
 
 // ValidateResourcePool validates a resource pool is none or the k8s dummy pool.

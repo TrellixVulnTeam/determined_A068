@@ -28,6 +28,9 @@ type ResourceManager interface {
 		actor.Messenger,
 		sproto.ValidateCommandResourcesRequest,
 	) (sproto.ValidateCommandResourcesResponse, error)
+	ValidateResources(
+		ctx actor.Messenger, name string, slots int, command bool,
+	) error
 	DeleteJob(actor.Messenger, sproto.DeleteJob) (sproto.DeleteJobResponse, error)
 
 	// Scheduling related stuff
@@ -58,7 +61,7 @@ type ResourceManager interface {
 		ctx actor.Messenger,
 		name string,
 		slots int,
-		command bool) (string, error)
+	) (string, error)
 	GetResourcePoolAvailability(
 		ctx actor.Messenger,
 		name string,

@@ -85,10 +85,14 @@ func (a *apiServer) getCommandLaunchParams(ctx context.Context, req *protoComman
 		resources.Slots = 0
 	}
 	poolName, err := a.m.rm.ResolveResourcePool(
-		a.m.system, resources.ResourcePool, resources.Slots, true)
+		a.m.system, resources.ResourcePool, resources.Slots)
 	if err != nil {
 		return nil, launchWarnings, status.Errorf(codes.InvalidArgument, err.Error())
 	}
+	if err = a.m.rm.ValidateResources(a.m.system, poolName, resources.Slots, true); err != nil {
+		return nil, launchWarnings, fmt.Errorf("validating resources: %v", err)
+	}
+
 	launchWarnings, err = a.m.rm.GetResourcePoolAvailability(a.m.system, poolName, resources.Slots)
 	if err != nil {
 		return nil, launchWarnings, fmt.Errorf("checking respurce availability: %v", err.Error())
