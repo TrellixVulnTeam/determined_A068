@@ -34,8 +34,10 @@ def start_tensorboard(args: Namespace) -> None:
     resp = api_resp["tensorboard"]
     warnings = api_resp.get("warnings")
 
-    currentSlotsExceeded = warnings and bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED in warnings
-    
+    currentSlotsExceeded = (
+        warnings and bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED in warnings
+    )
+
     if args.detach:
         print(resp["id"])
         return
