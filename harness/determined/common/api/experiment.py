@@ -150,7 +150,7 @@ def create_experiment(
         return 0
 
     if len(r.content) > 0:
-        warnings = r.json().get('warnings')
+        warnings = r.json().get("warnings")
 
     new_resource = r.headers["Location"]
     experiment_id = int(new_resource.split("/")[-1])

@@ -32,7 +32,7 @@ class ExperimentState(enum.Enum):
         return bindings.determinedexperimentv1State(self.value)
 
 
-class                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           ExperimentReference:
+class ExperimentReference:
     """
     An ExperimentReference object is usually obtained from
     ``determined.experimental.client.create_experiment()``
