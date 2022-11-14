@@ -172,13 +172,14 @@ func (a AgentResourceManager) GetResourcePoolAvailability(ctx actor.Messenger,
 	[]command.LaunchWarning,
 	error,
 ) {
-	launchWarnings := []command.LaunchWarning{}
+	var launchWarnings []command.LaunchWarning
+
 	if slots == 0 {
-		return launchWarnings, nil
+		return nil, nil
 	}
 	currentMaxSlotsExceeded, err := a.CheckMaxSlotsExceeded(ctx, name, slots)
 	if err != nil {
-		return launchWarnings, fmt.Errorf("validating request for (%s, %d): %w", name, slots, err)
+		return nil, fmt.Errorf("validating request for (%s, %d): %w", name, slots, err)
 	}
 	if currentMaxSlotsExceeded {
 		launchWarnings = append(launchWarnings, command.CurrentSlotsExceeded)

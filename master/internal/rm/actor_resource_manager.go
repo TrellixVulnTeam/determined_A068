@@ -57,8 +57,7 @@ func (r *ActorResourceManager) GetResourcePoolAvailability(
 	[]command.LaunchWarning,
 	error,
 ) {
-	launchWarnings := []command.LaunchWarning{}
-	return launchWarnings, nil
+	return nil, nil
 }
 
 // ValidateResourcePool is a default implementation to satisfy the interface, mostly for tests.

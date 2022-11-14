@@ -111,14 +111,13 @@ func (k KubernetesResourceManager) GetResourcePoolAvailability(
 	name string,
 	slots int,
 ) ([]command.LaunchWarning, error) {
-	launchWarnings := []command.LaunchWarning{}
 	if slots == 0 {
-		return launchWarnings, nil
+		return nil, nil
 	}
 	if name != "" && name != KubernetesDummyResourcePool {
-		return launchWarnings, fmt.Errorf("k8s doesn't not support resource pools")
+		return nil, fmt.Errorf("k8s doesn't not support resource pools")
 	}
-	return launchWarnings, nil
+	return nil, nil
 }
 
 // GetDefaultComputeResourcePool requests the default compute resource pool.
