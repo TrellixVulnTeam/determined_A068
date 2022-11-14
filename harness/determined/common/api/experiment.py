@@ -128,6 +128,7 @@ def create_experiment(
     activate: bool = True,
     additional_body_fields: Optional[Dict[str, Any]] = None,
 ) -> int:
+    warnings = None
     body = {
         "activate": False,
         "experiment_config": yaml.safe_dump(config),
@@ -148,6 +149,9 @@ def create_experiment(
     if validate_only:
         return 0
 
+    if len(r.content) > 0:
+        warnings = r.json().get('warnings')
+
     new_resource = r.headers["Location"]
     experiment_id = int(new_resource.split("/")[-1])
 
@@ -155,7 +159,7 @@ def create_experiment(
         sess = api.Session(master_url, None, None, None)
         bindings.post_ActivateExperiment(sess, id=experiment_id)
 
-    return experiment_id
+    return experiment_id, warnings
 
 
 def generate_random_hparam_values(hparam_def: Dict[str, Any]) -> Dict[str, Any]:
