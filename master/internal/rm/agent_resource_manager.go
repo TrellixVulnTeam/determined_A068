@@ -127,7 +127,7 @@ func (a AgentResourceManager) ResolveResourcePool(
 		req := sproto.GetDefaultAuxResourcePoolRequest{}
 		resp, err := a.GetDefaultAuxResourcePool(ctx, req)
 		if err != nil {
-			return resp.PoolName, fmt.Errorf("defaulting to aux pool: %w", err)
+			return "", fmt.Errorf("defaulting to aux pool: %w", err)
 		}
 		return resp.PoolName, nil
 	}
@@ -136,13 +136,13 @@ func (a AgentResourceManager) ResolveResourcePool(
 		req := sproto.GetDefaultComputeResourcePoolRequest{}
 		resp, err := a.GetDefaultComputeResourcePool(ctx, req)
 		if err != nil {
-			return name, fmt.Errorf("defaulting to compute pool: %w", err)
+			return "", fmt.Errorf("defaulting to compute pool: %w", err)
 		}
 		return resp.PoolName, nil
 	}
 
 	if err := a.ValidateResourcePool(ctx, name); err != nil {
-		return name, fmt.Errorf("validating pool: %w", err)
+		return "", fmt.Errorf("validating pool: %w", err)
 	}
 	return name, nil
 }
