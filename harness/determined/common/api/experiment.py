@@ -129,6 +129,8 @@ def create_experiment(
     additional_body_fields: Optional[Dict[str, Any]] = None,
 ) -> int:
 
+    warnings = None
+
     body = {
         "activate": False,
         "experiment_config": yaml.safe_dump(config),
@@ -143,11 +145,14 @@ def create_experiment(
         body.update(additional_body_fields)
 
     r = req.post(master_url, "experiments", json=body)
+
     if not hasattr(r, "headers"):
         raise Exception(r)
 
     if validate_only:
         return 0
+
+    warnings = r.json().get("warnings")
 
     new_resource = r.headers["Location"]
     experiment_id = int(new_resource.split("/")[-1])
@@ -156,7 +161,9 @@ def create_experiment(
         sess = api.Session(master_url, None, None, None)
         bindings.post_ActivateExperiment(sess, id=experiment_id)
 
-    return experiment_id
+    launch_warnings = list(bindings.v1LaunchWarning)
+    warnings = [launch_warnings[warning].value for warning in warnings]
+    return experiment_id, warnings
 
 
 def generate_random_hparam_values(hparam_def: Dict[str, Any]) -> Dict[str, Any]:
@@ -241,7 +248,7 @@ def create_experiment_and_follow_logs(
     activate: bool = True,
     follow_first_trial_logs: bool = True,
 ) -> int:
-    exp_id = api.experiment.create_experiment(
+    exp_id, warnings = api.experiment.create_experiment(
         master_url,
         config,
         model_context,
@@ -250,6 +257,15 @@ def create_experiment_and_follow_logs(
         activate=activate,
     )
     print("Created experiment {}".format(exp_id))
+
+    if warnings and (
+        bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED.value in warnings
+    ):
+        warning = (
+            "Warning: The created experiment requires more slots than currently available."
+            "You may need to increase cluster resources in order for the job to run."
+        )
+        print(colored(warning, "yellow"))
 
     if activate and follow_first_trial_logs:
         api.follow_experiment_logs(master_url, exp_id)
