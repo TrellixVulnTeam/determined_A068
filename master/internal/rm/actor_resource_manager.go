@@ -64,7 +64,8 @@ func (r *ActorResourceManager) GetResourcePoolAvailability(
 // ValidateResourcePool is a default implementation to satisfy the interface, mostly for tests.
 func (r *ActorResourceManager) ValidateResourcePool(
 	ctx actor.Messenger,
-	name string) error {
+	name string,
+) error {
 	return nil
 }
 

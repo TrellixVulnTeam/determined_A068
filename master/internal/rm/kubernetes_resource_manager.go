@@ -109,7 +109,8 @@ func (k KubernetesResourceManager) ValidateResourcePool(ctx actor.Messenger, nam
 func (k KubernetesResourceManager) GetResourcePoolAvailability(
 	ctx actor.Messenger,
 	name string,
-	slots int) ([]command.LaunchWarning, error) {
+	slots int,
+) ([]command.LaunchWarning, error) {
 	launchWarnings := []command.LaunchWarning{}
 	if slots == 0 {
 		return launchWarnings, nil
