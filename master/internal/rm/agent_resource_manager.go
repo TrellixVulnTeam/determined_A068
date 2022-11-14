@@ -166,8 +166,8 @@ func (a AgentResourceManager) ValidateResources(
 	return nil
 }
 
-// GetResourcePoolAvailability is a default implementation to satisfy the interface.
-func (a AgentResourceManager) GetResourcePoolAvailability(ctx actor.Messenger,
+// ValidateResourcePoolAvailability is a default implementation to satisfy the interface.
+func (a AgentResourceManager) ValidateResourcePoolAvailability(ctx actor.Messenger,
 	name string, slots int) (
 	[]command.LaunchWarning,
 	error,

@@ -62,7 +62,7 @@ type ResourceManager interface {
 		name string,
 		slots int,
 	) (string, error)
-	GetResourcePoolAvailability(
+	ValidateResourcePoolAvailability(
 		ctx actor.Messenger,
 		name string,
 		slots int) ([]command.LaunchWarning, error)

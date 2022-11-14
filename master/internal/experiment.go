@@ -134,7 +134,7 @@ func newExperiment(m *Master, expModel *model.Experiment, taskSpec *tasks.TaskSp
 	if err = m.rm.ValidateResources(m.system, poolName, resources.SlotsPerTrial(), false); err != nil {
 		return nil, launchWarnings, fmt.Errorf("validating resources: %v", err)
 	}
-	launchWarnings, err = m.rm.GetResourcePoolAvailability(
+	launchWarnings, err = m.rm.ValidateResourcePoolAvailability(
 		m.system,
 		poolName,
 		resources.SlotsPerTrial(),

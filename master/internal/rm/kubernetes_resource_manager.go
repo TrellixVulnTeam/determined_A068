@@ -105,15 +105,12 @@ func (k KubernetesResourceManager) ValidateResourcePool(ctx actor.Messenger, nam
 	return nil
 }
 
-// GetResourcePoolAvailability checks the available resources for a given pool.
-func (k KubernetesResourceManager) GetResourcePoolAvailability(
+// ValidateResourcePoolAvailability checks the available resources for a given pool.
+func (k KubernetesResourceManager) ValidateResourcePoolAvailability(
 	ctx actor.Messenger,
 	name string,
 	slots int,
 ) ([]command.LaunchWarning, error) {
-	if slots == 0 {
-		return nil, nil
-	}
 	if name != "" && name != KubernetesDummyResourcePool {
 		return nil, fmt.Errorf("k8s doesn't not support resource pools")
 	}

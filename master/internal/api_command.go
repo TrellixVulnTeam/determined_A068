@@ -95,7 +95,7 @@ func (a *apiServer) getCommandLaunchParams(ctx context.Context, req *protoComman
 		return nil, launchWarnings, fmt.Errorf("validating resources: %v", err)
 	}
 
-	launchWarnings, err = a.m.rm.GetResourcePoolAvailability(a.m.system, poolName, resources.Slots)
+	launchWarnings, err = a.m.rm.ValidateResourcePoolAvailability(a.m.system, poolName, resources.Slots)
 	if err != nil {
 		return nil, launchWarnings, fmt.Errorf("checking respurce availability: %v", err.Error())
 	}
