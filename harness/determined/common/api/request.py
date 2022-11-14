@@ -375,8 +375,8 @@ def parse_warnings(
             if isinstance(warning, int):
                 warning_value: int = warning
                 warning_enum_values.append(warning_message_int_to_enum_value[warning_value])
-            elif isinstance(warning, bindings.v1LaunchWarning):
-                warning_enum_value: bindings.v1LaunchWarning = warning
+            elif isinstance(warning, str):
+                warning_enum_value: bindings.v1LaunchWarning = bindings.v1LaunchWarning(warning)
                 warning_enum_values.append(warning_enum_value)
 
     return warning_enum_values
