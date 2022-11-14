@@ -151,7 +151,7 @@ def create_experiment(
         raise Exception(r)
 
     if validate_only:
-        return 0
+        return 0, None
 
     try:
         warnings = r.json().get("warnings")
@@ -295,7 +295,7 @@ def create_test_experiment_and_follow_logs(
     print(colored("Experiment configuration validation succeeded! 🎉", "green"))
 
     print(colored("Creating test experiment...", "yellow"), end="\r")
-    exp_id = api.experiment.create_experiment(
+    exp_id, _ = api.experiment.create_experiment(
         master_url,
         make_test_experiment_config(config),
         model_context,
