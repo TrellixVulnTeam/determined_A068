@@ -4,7 +4,7 @@ import random
 import sys
 import time
 import uuid
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Tuple
 
 from termcolor import colored
 
@@ -128,7 +128,7 @@ def create_experiment(
     archived: bool = False,
     activate: bool = True,
     additional_body_fields: Optional[Dict[str, Any]] = None,
-) -> int:
+) -> Tuple[int, Optional[str]]:
 
     warnings = None
 
