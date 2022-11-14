@@ -39,7 +39,9 @@ def start_tensorboard(args: Namespace) -> None:
 
     warnings = command.parse_warnings(api_resp.get("warnings"))
     command.handle_warnings(resp.warnings)
-
+    currentSlotsExceeded = (warnings is not None) and (
+        bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED in warnings
+    )
     url = "tensorboard/{}/events".format(resp["id"])
     with api.ws(args.master, url) as ws:
         for msg in ws:
@@ -61,8 +63,7 @@ def start_tensorboard(args: Namespace) -> None:
                             resource_pool=resp["resourcePool"],
                             description=resp["description"],
                             task_type="tensorboard",
-                            currentSlotsExceeded=bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED
-                            in warnings,
+                            currentSlotsExceeded=currentSlotsExceeded,
                         ),
                     )
                 print(colored("TensorBoard is running at: {}".format(url), "green"))

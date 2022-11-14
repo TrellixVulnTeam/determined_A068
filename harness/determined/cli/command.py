@@ -4,7 +4,7 @@ import re
 from argparse import Namespace
 from collections import OrderedDict, namedtuple
 from pathlib import Path
-from typing import IO, Any, Dict, Iterable, List, Optional, Tuple, Union
+from typing import IO, Any, Dict, Iterable, List, Optional, Sequence, Tuple, Union
 
 from termcolor import colored
 
@@ -391,25 +391,29 @@ def render_event_stream(event: Any) -> None:
         raise ValueError("unexpected event: {}".format(event))
 
 
-def parse_warnings(warnings: Optional[Union[bindings.v1LaunchWarning, int]]):
+def parse_warnings(
+    warnings: Optional[Union[Sequence[bindings.v1LaunchWarning], Sequence[int]]]
+) -> Optional[Sequence[bindings.v1LaunchWarning]]:
 
     # Warnings may be passed in as either an enum value or integer value
     warning_message_int_to_enum_value = {
         1: bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED
     }
 
-    lambda warning: warning if isinstance(warning, str) else warning_message_int_to_enum_value[
-        warning
-    ]
+    warning_enum_values: list[bindings.v1LaunchWarning] = []
     if warnings:
-        return [
-            warning if isinstance(warning, str) else warning_message_int_to_enum_value[warning]
-            for warning in warnings
-        ]
-    return warnings
+        for warning in warnings:
+            if isinstance(warning, int):
+                warning_value: int = warning
+                warning_enum_values.append(warning_message_int_to_enum_value[warning_value])
+            elif isinstance(warning, bindings.v1LaunchWarning):
+                warning_enum_value: bindings.v1LaunchWarning = warning
+                warning_enum_values.append(warning_enum_value)
+
+    return warning_enum_values
 
 
-def handle_warnings(warnings: Optional[bindings.v1LaunchWarning]):
+def handle_warnings(warnings: Optional[Sequence[bindings.v1LaunchWarning]]) -> None:
     warning_message_map = {
         bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED: (
             "Warning: The requested job requires more slots than currently available. "
