@@ -102,7 +102,7 @@ export const paths = {
     return `/interactive/${command.id}/${command.type}/
       ${command.name}/${command.resourcePool}/${encodeURIComponent(
       waitPageUrl(command),
-    )}/${maxSlotsExceeded}`;
+    )}?currentSlotsExceeded=${maxSlotsExceeded}`;
   },
   jobs: (): string => {
     return routeById.jobs.path;

@@ -1,3 +1,4 @@
+import queryString from 'query-string';
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams } from 'react-router-dom';
@@ -14,13 +15,16 @@ import css from './InteractiveTask.module.scss';
 import TaskLogs from './TaskLogs';
 
 type Params = {
-  maxSlotsExceeded: string;
   taskId: string;
   taskName: string;
   taskResourcePool: string;
   taskType: CommandType;
   taskUrl: string;
 };
+
+interface Queries {
+  currentSlotsExceeded?: string;
+}
 
 const PageView = {
   IFRAME: 'Iframe',
@@ -59,17 +63,18 @@ export const InteractiveTask: React.FC = () => {
     taskResourcePool: tResourcePool,
     taskType: tType,
     taskUrl: tUrl,
-    maxSlotsExceeded: maxSlotsExceeded,
   } = useParams<Params>();
   const [taskState, setTaskState] = useState<CommandState>();
+  const { currentSlotsExceeded }: Queries = queryString.parse(location.search);
   const { actions: uiActions, ui } = useUI();
+
+  const slotsExceeded = currentSlotsExceeded ? currentSlotsExceeded === 'true' : false;
 
   const taskId = tId ?? '';
   const taskName = tName ?? '';
   const taskResourcePool = tResourcePool ?? '';
   const taskType = tType as CommandType;
   const taskUrl = tUrl ?? '';
-  const currentMaxSlotsExceeded = maxSlotsExceeded === 'true' ? true : false;
 
   useEffect(() => {
     uiActions.hideChrome();
@@ -77,17 +82,17 @@ export const InteractiveTask: React.FC = () => {
   }, [uiActions]);
 
   useEffect(() => {
-    if (currentMaxSlotsExceeded) {
+    if (slotsExceeded) {
       handleWarning({
         level: ErrorLevel.Warn,
         publicMessage:
           'The requested job requires more slots than currently available. You may need to increase cluster resources in order for the job to run.',
-        publicSubject: 'Current Maximum Slots Exceeded',
+        publicSubject: 'Current Slots Exceeded',
         silent: false,
         type: ErrorType.Server,
       });
     }
-  }, [currentMaxSlotsExceeded]);
+  }, [slotsExceeded]);
 
   useEffect(() => {
     const queryTask = setInterval(async () => {

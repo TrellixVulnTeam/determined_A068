@@ -62,14 +62,14 @@ def make_interactive_task_url(
     wait_page_url = "{}/wait/{}/{}?eventUrl={}&serviceAddr={}".format(
         public_url, task_type, task_id, wait_path_url, service_address
     )
-    task_web_url = "{}/interactive/{}/{}/{}/{}/{}/{}".format(
+    task_web_url = "{}/interactive/{}/{}/{}/{}/{}?{}".format(
         public_url,
         task_id,
         task_type,
         parse.quote(description),
         resource_pool,
         parse.quote_plus(wait_page_url),
-        str(currentSlotsExceeded).lower(),
+        f"currentSlotsExceeded={str(currentSlotsExceeded).lower()}",
     )
     return task_web_url
 

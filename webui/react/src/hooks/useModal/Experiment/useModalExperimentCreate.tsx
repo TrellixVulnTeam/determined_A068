@@ -224,15 +224,15 @@ const useModalExperimentCreate = ({ onClose }: Props = {}): ModalHooks => {
           parentId: modalState.experiment.id,
           projectId: modalState.experiment.projectId,
         });
-        const maxSlotsExceeded = warnings
+        const currentSlotsExceeded = warnings
           ? warnings.includes(V1LaunchWarning.CURRENTSLOTSEXCEEDED)
           : false;
-        if (maxSlotsExceeded) {
+        if (currentSlotsExceeded) {
           handleWarning({
             level: ErrorLevel.Warn,
             publicMessage:
               'The requested job requires more slots than currently available. You may need to increase cluster resources in order for the job to run.',
-            publicSubject: 'Current Maximum Slots Exceeded',
+            publicSubject: 'Current Slots Exceeded',
             silent: false,
             type: ErrorType.Server,
           });
