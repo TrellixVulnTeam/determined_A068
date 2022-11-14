@@ -23,7 +23,7 @@ func toProtoEnum(l LaunchWarning) apiv1.LaunchWarning {
 	}
 }
 
-// ToProto converts LaunchWarnings to their protobuf representation.
+// LaunchWarningToProto converts LaunchWarnings to their protobuf representation.
 func LaunchWarningToProto(lw []LaunchWarning) []apiv1.LaunchWarning {
 	res := make([]apiv1.LaunchWarning, 0, len(lw))
 	for _, w := range lw {

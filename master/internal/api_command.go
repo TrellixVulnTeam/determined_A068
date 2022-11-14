@@ -299,6 +299,6 @@ func (a *apiServer) LaunchCommand(
 	return &apiv1.LaunchCommandResponse{
 		Command:  cmd,
 		Config:   protoutils.ToStruct(spec.Config),
-		Warnings: command.ToProto(launchWarnings),
+		Warnings: command.LaunchWarningToProto(launchWarnings),
 	}, nil
 }

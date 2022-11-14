@@ -224,6 +224,6 @@ func (a *apiServer) LaunchNotebook(
 	return &apiv1.LaunchNotebookResponse{
 		Notebook: notebook,
 		Config:   protoutils.ToStruct(spec.Config),
-		Warnings: command.ToProto(launchWarnings),
+		Warnings: command.LaunchWarningToProto(launchWarnings),
 	}, nil
 }

@@ -1174,7 +1174,7 @@ func (a *apiServer) CreateExperiment(
 	return &apiv1.CreateExperimentResponse{
 		Experiment: protoExp,
 		Config:     protoutils.ToStruct(e.Config),
-		Warnings:   command.ToProto(launchWarnings),
+		Warnings:   command.LaunchWarningToProto(launchWarnings),
 	}, nil
 }
 

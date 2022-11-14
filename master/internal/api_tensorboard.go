@@ -391,7 +391,7 @@ func (a *apiServer) LaunchTensorboard(
 	return &apiv1.LaunchTensorboardResponse{
 		Tensorboard: tb,
 		Config:      protoutils.ToStruct(spec.Config),
-		Warnings:    command.ToProto(launchWarnings),
+		Warnings:    command.LaunchWarningToProto(launchWarnings),
 	}, err
 }
 
