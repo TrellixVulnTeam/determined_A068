@@ -10,16 +10,12 @@ import (
 type LaunchWarning int
 
 const (
-	// DEFAULT is the default value.
-	DEFAULT LaunchWarning = 0
 	// CurrentSlotsExceeded represents a resource pool having insufficient slots.
 	CurrentSlotsExceeded LaunchWarning = 1
 )
 
 func toProtoEnum(l LaunchWarning) apiv1.LaunchWarning {
 	switch l {
-	case DEFAULT:
-		return apiv1.LaunchWarning_LAUNCH_WARNING_UNSPECIFIED
 	case CurrentSlotsExceeded:
 		return apiv1.LaunchWarning_LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED
 	default:
@@ -28,7 +24,7 @@ func toProtoEnum(l LaunchWarning) apiv1.LaunchWarning {
 }
 
 // ToProto converts LaunchWarnings to their protobuf representation.
-func ToProto(lw []LaunchWarning) []apiv1.LaunchWarning {
+func LaunchWarningToProto(lw []LaunchWarning) []apiv1.LaunchWarning {
 	res := make([]apiv1.LaunchWarning, 0, len(lw))
 	for _, w := range lw {
 		res = append(res, toProtoEnum(w))

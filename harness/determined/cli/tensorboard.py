@@ -32,22 +32,13 @@ def start_tensorboard(args: Namespace) -> None:
     api_resp = api.post(args.master, "api/v1/tensorboards", json=req_body).json()
 
     resp = api_resp["tensorboard"]
-    warnings = api_resp.get("warnings")
-
-    currentSlotsExceeded = (
-        warnings and bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED in warnings
-    )
 
     if args.detach:
         print(resp["id"])
         return
 
-    if currentSlotsExceeded:
-        warning = (
-            "Warning: The requested job requires more slots than currently available."
-            "You may need to increase cluster resources in order for the job to run."
-        )
-        print(colored(warning, "yellow"))
+    warnings = command.parse_warnings(api_resp.get("warnings"))
+    command.handle_warnings(resp.warnings)
 
     url = "tensorboard/{}/events".format(resp["id"])
     with api.ws(args.master, url) as ws:
@@ -70,7 +61,8 @@ def start_tensorboard(args: Namespace) -> None:
                             resource_pool=resp["resourcePool"],
                             description=resp["description"],
                             task_type="tensorboard",
-                            currentSlotsExceeded=currentSlotsExceeded,
+                            currentSlotsExceeded=bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED
+                            in warnings,
                         ),
                     )
                 print(colored("TensorBoard is running at: {}".format(url), "green"))

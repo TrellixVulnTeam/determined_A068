@@ -28,24 +28,13 @@ def start_notebook(args: Namespace) -> None:
         return
 
     nb = resp.notebook
-    warnings = resp.warnings
-
-    currentSlotsExceeded = (
-        True
-        if (warnings and bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED in warnings)
-        else False
-    )
 
     if args.detach:
         print(nb.id)
         return
 
-    if currentSlotsExceeded:
-        warning = (
-            "Warning: The requested job requires more slots than currently available. "
-            "You may need to increase cluster resources in order for the job to run."
-        )
-        print(colored(warning, "yellow"))
+    warnings = command.parse_warnings(resp.warnings)
+    command.handle_warnings(resp.warnings)
 
     with api.ws(args.master, "notebooks/{}/events".format(nb.id)) as ws:
         for msg in ws:
@@ -58,7 +47,8 @@ def start_notebook(args: Namespace) -> None:
                         description=nb.description,
                         resource_pool=nb.resourcePool,
                         task_type="notebook",
-                        currentSlotsExceeded=currentSlotsExceeded,
+                        currentSlotsExceeded=bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED
+                        in warnings,
                     ),
                 )
                 print(colored("Jupyter Notebook is running at: {}".format(url), "green"))

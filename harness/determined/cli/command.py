@@ -10,7 +10,7 @@ from termcolor import colored
 
 from determined.cli import render
 from determined.common import api, context, util, yaml
-from determined.common.api import authentication
+from determined.common.api import authentication, bindings
 
 yaml = yaml.YAML(typ="safe", pure=True)  # type: ignore
 
@@ -389,3 +389,33 @@ def render_event_stream(event: Any) -> None:
         print(event["log_event"], flush=True)
     else:
         raise ValueError("unexpected event: {}".format(event))
+
+
+def parse_warnings(warnings: Optional[Union[bindings.v1LaunchWarning, int]]):
+
+    # Warnings may be passed in as either an enum value or integer value
+    warning_message_int_to_enum_value = {
+        1: bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED
+    }
+
+    lambda warning: warning if isinstance(warning, str) else warning_message_int_to_enum_value[
+        warning
+    ]
+    if warnings:
+        return [
+            warning if isinstance(warning, str) else warning_message_int_to_enum_value[warning]
+            for warning in warnings
+        ]
+    return warnings
+
+
+def handle_warnings(warnings: Optional[bindings.v1LaunchWarning]):
+    warning_message_map = {
+        bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED: (
+            "Warning: The requested job requires more slots than currently available. "
+            "You may need to increase cluster resources in order for the job to run."
+        )
+    }
+    if warnings:
+        for warning in warnings:
+            print(colored(warning_message_map[warning], "yellow"))
