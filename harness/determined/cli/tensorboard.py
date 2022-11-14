@@ -37,8 +37,8 @@ def start_tensorboard(args: Namespace) -> None:
         print(resp["id"])
         return
 
-    warnings = command.parse_warnings(api_resp.get("warnings"))
-    command.handle_warnings(resp.warnings)
+    warnings = request.parse_warnings(api_resp.get("warnings"))
+    request.handle_warnings(resp.warnings)
     currentSlotsExceeded = (warnings is not None) and (
         bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED in warnings
     )

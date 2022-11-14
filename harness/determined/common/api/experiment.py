@@ -4,12 +4,13 @@ import random
 import sys
 import time
 import uuid
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Sequence, Tuple
 
 from termcolor import colored
 
 from determined.common import api, constants, context, yaml
 from determined.common.api import bindings, logs
+from determined.common.api import request
 from determined.common.api import request as req
 
 
@@ -128,7 +129,7 @@ def create_experiment(
     archived: bool = False,
     activate: bool = True,
     additional_body_fields: Optional[Dict[str, Any]] = None,
-) -> Tuple[int, Optional[str]]:
+) -> Tuple[int, Optional[Sequence[bindings.v1LaunchWarning]]]:
 
     warnings = None
 
@@ -262,14 +263,8 @@ def create_experiment_and_follow_logs(
     )
     print("Created experiment {}".format(exp_id))
 
-    if warnings and (
-        bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED.value in warnings
-    ):
-        warning = (
-            "Warning: The created experiment requires more slots than currently available."
-            "You may need to increase cluster resources in order for the job to run."
-        )
-        print(colored(warning, "yellow"))
+    warnings = request.parse_warnings(warnings)
+    request.handle_warnings(warnings)
 
     if activate and follow_first_trial_logs:
         api.follow_experiment_logs(master_url, exp_id)

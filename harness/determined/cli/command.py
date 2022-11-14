@@ -4,13 +4,13 @@ import re
 from argparse import Namespace
 from collections import OrderedDict, namedtuple
 from pathlib import Path
-from typing import IO, Any, Dict, Iterable, List, Optional, Sequence, Tuple, Union
+from typing import IO, Any, Dict, Iterable, List, Optional, Tuple, Union
 
 from termcolor import colored
 
 from determined.cli import render
 from determined.common import api, context, util, yaml
-from determined.common.api import authentication, bindings
+from determined.common.api import authentication
 
 yaml = yaml.YAML(typ="safe", pure=True)  # type: ignore
 
@@ -389,37 +389,3 @@ def render_event_stream(event: Any) -> None:
         print(event["log_event"], flush=True)
     else:
         raise ValueError("unexpected event: {}".format(event))
-
-
-def parse_warnings(
-    warnings: Optional[Union[Sequence[bindings.v1LaunchWarning], Sequence[int]]]
-) -> Optional[Sequence[bindings.v1LaunchWarning]]:
-
-    # Warnings may be passed in as either an enum value or integer value
-    warning_message_int_to_enum_value = {
-        1: bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED
-    }
-
-    warning_enum_values: list[bindings.v1LaunchWarning] = []
-    if warnings:
-        for warning in warnings:
-            if isinstance(warning, int):
-                warning_value: int = warning
-                warning_enum_values.append(warning_message_int_to_enum_value[warning_value])
-            elif isinstance(warning, bindings.v1LaunchWarning):
-                warning_enum_value: bindings.v1LaunchWarning = warning
-                warning_enum_values.append(warning_enum_value)
-
-    return warning_enum_values
-
-
-def handle_warnings(warnings: Optional[Sequence[bindings.v1LaunchWarning]]) -> None:
-    warning_message_map = {
-        bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED: (
-            "Warning: The requested job requires more slots than currently available. "
-            "You may need to increase cluster resources in order for the job to run."
-        )
-    }
-    if warnings:
-        for warning in warnings:
-            print(colored(warning_message_map[warning], "yellow"))
