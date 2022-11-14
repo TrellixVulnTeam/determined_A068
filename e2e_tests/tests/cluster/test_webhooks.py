@@ -61,7 +61,7 @@ def test_slack_webhook() -> None:
     result = bindings.post_PostWebhook(sess, body=webhook_request)
     assert result.webhook.url == webhook_request.url
 
-    experiment_id = exp.create_experiment(
+    experiment_id, _ = exp.create_experiment(
         conf.fixtures_path("no_op/single-one-short-step.yaml"), conf.fixtures_path("no_op")
     )
 

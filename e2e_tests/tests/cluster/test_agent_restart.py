@@ -64,7 +64,7 @@ def _task_list_json(master_url: str) -> Dict[str, Dict[str, Any]]:
 def test_agent_restart_exp_container_failure(managed_cluster_restarts: ManagedCluster) -> None:
     managed_cluster_restarts.ensure_agent_ok()
     try:
-        exp_id = exp.create_experiment(
+        exp_id, _ = exp.create_experiment(
             conf.fixtures_path("no_op/single-medium-train-step.yaml"),
             conf.fixtures_path("no_op"),
             None,
@@ -226,7 +226,7 @@ def test_agent_restart_recover_experiment(
 
     managed_cluster_restarts.ensure_agent_ok()
     try:
-        exp_id = exp.create_experiment(
+        exp_id, _ = exp.create_experiment(
             conf.fixtures_path("no_op/single-medium-train-step.yaml"),
             conf.fixtures_path("no_op"),
             None,
@@ -254,7 +254,7 @@ def test_agent_reconnect_keep_experiment(managed_cluster_restarts: ManagedCluste
     managed_cluster_restarts.ensure_agent_ok()
 
     try:
-        exp_id = exp.create_experiment(
+        exp_id, _ = exp.create_experiment(
             conf.fixtures_path("no_op/single-medium-train-step.yaml"),
             conf.fixtures_path("no_op"),
             None,
@@ -325,7 +325,7 @@ def test_agent_reconnect_trigger_schedule(
 def test_queued_experiment_restarts_with_correct_allocation_id(
     managed_cluster_restarts: ManagedCluster,
 ) -> None:
-    exp_id = exp.create_experiment(
+    exp_id, _ = exp.create_experiment(
         conf.fixtures_path("no_op/single-medium-train-step.yaml"),
         conf.fixtures_path("no_op"),
         ["--config", "resources.slots_per_trial=9999"],

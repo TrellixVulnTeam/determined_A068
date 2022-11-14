@@ -119,14 +119,7 @@ class Determined:
         exp_id = resp.experiment.id
         exp = experiment.ExperimentReference(exp_id, self._session)
 
-        warnings = resp.warnings
-        if warnings and bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED in warnings:
-            warning = (
-                "Warning: The submitted experiment requires more slots than currently available. "
-                "You may need to increase cluster resources in order for the job to run."
-            )
-            print(colored(warning, "yellow"))
-        return exp
+        return exp, resp.warnings
 
     def get_experiment(self, experiment_id: int) -> experiment.ExperimentReference:
         """

@@ -325,7 +325,7 @@ def test_stress_agents_reconnect(steps: int, num_agents: int, should_disconnect:
 
         # Can we still schedule something?
         if any(agents_are_up):
-            experiment_id = exp.create_experiment(
+            experiment_id, _ = exp.create_experiment(
                 conf.fixtures_path("no_op/single-one-short-step.yaml"),
                 conf.fixtures_path("no_op"),
                 None,

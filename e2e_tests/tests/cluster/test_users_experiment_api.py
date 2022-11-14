@@ -39,7 +39,7 @@ def test_experimental_experiment_api_determined_disabled() -> None:
             try_reauth=True,
             cert=certs.cli_cert,
         )
-        exp_id = determined_api.experiment.create_experiment_and_follow_logs(
+        exp_id, _ = determined_api.experiment.create_experiment_and_follow_logs(
             master_url=determined_master,
             config=dai_experiment_config,
             model_context=model_context,
