@@ -155,10 +155,10 @@ def create_experiment(
         return 0, None
 
     try:
-            warnings = r.json().get("warnings")
-            if warnings:
-                launch_warnings = list(bindings.v1LaunchWarning)
-                warnings = [launch_warnings[warning].value for warning in warnings]
+        warnings = r.json().get("warnings")
+        if warnings:
+            launch_warnings = list(bindings.v1LaunchWarning)
+            warnings = [launch_warnings[warning].value for warning in warnings]
     except json.decoder.JSONDecodeError:
         pass
 
