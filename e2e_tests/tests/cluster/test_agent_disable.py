@@ -104,7 +104,7 @@ def test_disable_agent_experiment_resume() -> None:
     assert len(slots) == 1
     agent_id = slots[0]["agent_id"]
 
-    exp_id, _ = exp.create_experiment(
+    exp_id = exp.create_experiment(
         conf.fixtures_path("no_op/single-medium-train-step.yaml"),
         conf.fixtures_path("no_op"),
         ["--config", "max_restarts=0"],
@@ -158,7 +158,7 @@ def test_drain_agent() -> None:
     assert len(slots) == 1
     agent_id = slots[0]["agent_id"]
 
-    experiment_id, _ = exp.create_experiment(
+    experiment_id = exp.create_experiment(
         conf.fixtures_path("no_op/single-medium-train-step.yaml"),
         conf.fixtures_path("no_op"),
         None,
@@ -173,7 +173,7 @@ def test_drain_agent() -> None:
 
     # Try to launch another experiment. It shouldn't get scheduled because the
     # slot is still busy with the first experiment.
-    experiment_id_no_start, _ = exp.create_experiment(
+    experiment_id_no_start = exp.create_experiment(
         conf.fixtures_path("no_op/single-medium-train-step.yaml"),
         conf.fixtures_path("no_op"),
         None,
@@ -220,7 +220,7 @@ def test_drain_agent_sched() -> None:
     slots = _wait_for_slots(2)
     assert len(slots) == 2
 
-    exp_id1, _ = exp.create_experiment(
+    exp_id1 = exp.create_experiment(
         conf.fixtures_path("no_op/single-medium-train-step.yaml"),
         conf.fixtures_path("no_op"),
         None,
@@ -233,7 +233,7 @@ def test_drain_agent_sched() -> None:
     agent_id1 = used_slots[0]["agent_id"]
 
     with _disable_agent(agent_id1, drain=True):
-        exp_id2, _ = exp.create_experiment(
+        exp_id2 = exp.create_experiment(
             conf.fixtures_path("no_op/single-medium-train-step.yaml"),
             conf.fixtures_path("no_op"),
             None,

@@ -237,7 +237,7 @@ def run_gc_checkpoints_test(checkpoint_storage: Dict[str, str]) -> None:
             with open(tf.name, "w") as f:
                 yaml.dump(config, f)
 
-            experiment_id, _ = exp.create_experiment(tf.name, conf.fixtures_path("no_op"))
+            experiment_id = exp.create_experiment(tf.name, conf.fixtures_path("no_op"))
 
         exp.wait_for_experiment_state(
             experiment_id, bindings.determinedexperimentv1State.STATE_COMPLETED

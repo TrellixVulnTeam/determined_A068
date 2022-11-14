@@ -48,7 +48,7 @@ def test_allocation_resources_incremental_release() -> None:
                 conf.fixtures_path("no_op/model_def.py"), os.path.join(context_dir, "model_def.py")
             )
 
-            exp_id, _ = exp.create_experiment(config_file.name, context_dir, None)
+            exp_id = exp.create_experiment(config_file.name, context_dir, None)
             cleanup_exp_ids.append(exp_id)
 
         # Wait for the experiment to start and run some.
@@ -78,7 +78,7 @@ def test_allocation_resources_incremental_release() -> None:
             )
 
         # Ensure we can schedule on the free slot, not only that the API says its available.
-        exp_id_2, _ = exp.create_experiment(
+        exp_id_2 = exp.create_experiment(
             conf.fixtures_path("no_op/single.yaml"),
             conf.fixtures_path("no_op"),
             None,

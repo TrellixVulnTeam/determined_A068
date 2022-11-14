@@ -85,7 +85,7 @@ def test_master_restart_reattach_recover_experiment(
     _sanity_check(managed_cluster_restarts)
 
     try:
-        exp_id, _ = exp.create_experiment(
+        exp_id = exp.create_experiment(
             conf.fixtures_path("no_op/single-medium-train-step.yaml"),
             conf.fixtures_path("no_op"),
             None,
@@ -118,7 +118,7 @@ def test_master_restart_kill_works(managed_cluster_restarts: ManagedCluster) -> 
     _sanity_check(managed_cluster_restarts)
 
     try:
-        exp_id, _ = exp.create_experiment(
+        exp_id = exp.create_experiment(
             conf.fixtures_path("no_op/single-many-long-steps.yaml"),
             conf.fixtures_path("no_op"),
             ["--config", "searcher.max_length.batches=10000", "--config", "max_restarts=0"],
@@ -257,7 +257,7 @@ def test_master_restart_tensorboard(
 ) -> None:
     managed_cluster = restartable_managed_cluster
 
-    exp_id, _ = exp.create_experiment(
+    exp_id = exp.create_experiment(
         conf.fixtures_path("no_op/single.yaml"),
         conf.fixtures_path("no_op"),
         None,

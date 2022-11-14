@@ -34,7 +34,7 @@ def _delete_workspace_and_check(
 
 def _check_test_experiment(project_id: int) -> None:
     # Create an experiment in that project.
-    test_exp_id, _ = exp.create_experiment(
+    test_exp_id = exp.create_experiment(
         conf.fixtures_path("core_api/whoami.yaml"),
         conf.fixtures_path("core_api"),
         ["--project_id", str(project_id)],

@@ -131,7 +131,7 @@ def test_trial_collections() -> None:
     authentication.cli_auth = authentication.Authentication(master_url, try_reauth=True)
     sess = utils.determined_test_session()
 
-    experiment_id, _ = exp.create_experiment(
+    experiment_id = exp.create_experiment(
         conf.fixtures_path("no_op/adaptive.yaml"), conf.fixtures_path("no_op")
     )
 
