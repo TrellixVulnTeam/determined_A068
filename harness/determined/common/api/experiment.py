@@ -1,3 +1,4 @@
+import json
 import math
 import random
 import sys
@@ -152,7 +153,12 @@ def create_experiment(
     if validate_only:
         return 0
 
-    warnings = r.json().get("warnings")
+    try: 
+        warnings = r.json().get("warnings")
+        launch_warnings = list(bindings.v1LaunchWarning)
+        warnings = [launch_warnings[warning].value for warning in warnings]
+    except json.decoder.JSONDecodeError: 
+        pass
 
     new_resource = r.headers["Location"]
     experiment_id = int(new_resource.split("/")[-1])
@@ -161,8 +167,6 @@ def create_experiment(
         sess = api.Session(master_url, None, None, None)
         bindings.post_ActivateExperiment(sess, id=experiment_id)
 
-    launch_warnings = list(bindings.v1LaunchWarning)
-    warnings = [launch_warnings[warning].value for warning in warnings]
     return experiment_id, warnings
 
 
