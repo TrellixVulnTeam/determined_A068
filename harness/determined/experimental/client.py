@@ -46,7 +46,7 @@ See :ref:`use-trained-models` for more ideas on what to do next.
 import functools
 import pathlib
 import warnings
-from typing import Any, Callable, Dict, Iterable, List, Optional, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Sequence, Tuple, Union
 
 from determined.common.api import Session  # noqa: F401
 from determined.common.experimental.checkpoint import (  # noqa: F401
@@ -144,7 +144,7 @@ def create_experiment(
     config: Union[str, pathlib.Path, Dict],
     model_dir: str,
     includes: Optional[Iterable[Union[str, pathlib.Path]]] = None,
-) -> ExperimentReference:
+) -> Tuple[ExperimentReference, Optional[Sequence[bindings.v1LaunchWarning]]]:
     """
     Creates an experiment with config parameters and model directory. The function
     returns an :class:`~determined.experimental.client.ExperimentReference` of the experiment.
