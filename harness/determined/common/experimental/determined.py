@@ -1,6 +1,6 @@
 import pathlib
 import warnings
-from typing import Any, Dict, Iterable, List, Optional, Union
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple, Union
 
 from determined.common import api, context, util, yaml
 from determined.common.api import authentication, bindings, certs
@@ -69,7 +69,7 @@ class Determined:
         config: Union[str, pathlib.Path, Dict],
         model_dir: Union[str, pathlib.Path],
         includes: Optional[Iterable[Union[str, pathlib.Path]]] = None,
-    ) -> experiment.ExperimentReference:
+    ) -> Tuple[experiment.ExperimentReference, Optional[Sequence[bindings.v1LaunchWarning]]]:
         """
         Create an experiment with config parameters and model directory. The function
         returns :class:`~determined.experimental.ExperimentReference` of the experiment.
