@@ -129,10 +129,10 @@ func newExperiment(m *Master, expModel *model.Experiment, taskSpec *tasks.TaskSp
 		m.system, resources.ResourcePool(), resources.SlotsPerTrial(),
 	)
 	if err != nil {
-		return nil, launchWarnings, fmt.Errorf("cannot create an experiment: %w", err)
+		return nil, nil, fmt.Errorf("cannot create an experiment: %w", err)
 	}
 	if err = m.rm.ValidateResources(m.system, poolName, resources.SlotsPerTrial(), false); err != nil {
-		return nil, launchWarnings, fmt.Errorf("validating resources: %v", err)
+		return nil, nil, fmt.Errorf("validating resources: %v", err)
 	}
 	launchWarnings, err = m.rm.ValidateResourcePoolAvailability(
 		m.system,

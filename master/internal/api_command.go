@@ -62,21 +62,21 @@ func (a *apiServer) getCommandLaunchParams(ctx context.Context, req *protoComman
 	userModel, _, err := grpcutil.GetUser(ctx)
 	if err != nil {
 		return nil,
-			launchWarnings,
+			nil,
 			status.Errorf(codes.Unauthenticated, "failed to get the user: %s", err)
 	}
 
 	// TODO(ilia): When commands are workspaced, also use workspace AgentUserGroup here.
 	agentUserGroup, err := user.GetAgentUserGroup(userModel.ID, nil)
 	if err != nil {
-		return nil, launchWarnings, err
+		return nil, nil, err
 	}
 
 	var configBytes []byte
 	if req.Config != nil {
 		configBytes, err = protojson.Marshal(req.Config)
 		if err != nil {
-			return nil, launchWarnings, status.Errorf(
+			return nil, nil, status.Errorf(
 				codes.InvalidArgument, "failed to parse config %s: %s", configBytes, err)
 		}
 	}
@@ -89,10 +89,10 @@ func (a *apiServer) getCommandLaunchParams(ctx context.Context, req *protoComman
 	poolName, err := a.m.rm.ResolveResourcePool(
 		a.m.system, resources.ResourcePool, resources.Slots)
 	if err != nil {
-		return nil, launchWarnings, status.Errorf(codes.InvalidArgument, err.Error())
+		return nil, nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 	if err = a.m.rm.ValidateResources(a.m.system, poolName, resources.Slots, true); err != nil {
-		return nil, launchWarnings, fmt.Errorf("validating resources: %v", err)
+		return nil, nil, fmt.Errorf("validating resources: %v", err)
 	}
 
 	launchWarnings, err = a.m.rm.ValidateResourcePoolAvailability(a.m.system, poolName, resources.Slots)
