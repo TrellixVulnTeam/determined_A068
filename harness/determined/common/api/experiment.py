@@ -153,11 +153,11 @@ def create_experiment(
     if validate_only:
         return 0
 
-    try: 
+    try:
         warnings = r.json().get("warnings")
         launch_warnings = list(bindings.v1LaunchWarning)
         warnings = [launch_warnings[warning].value for warning in warnings]
-    except json.decoder.JSONDecodeError: 
+    except json.decoder.JSONDecodeError:
         pass
 
     new_resource = r.headers["Location"]
