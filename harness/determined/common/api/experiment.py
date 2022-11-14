@@ -240,7 +240,7 @@ def create_experiment_and_follow_logs(
     activate: bool = True,
     follow_first_trial_logs: bool = True,
 ) -> int:
-    exp_id = api.experiment.create_experiment(
+    exp_id, warnings = api.experiment.create_experiment(
         master_url,
         config,
         model_context,
@@ -249,6 +249,12 @@ def create_experiment_and_follow_logs(
         activate=activate,
     )
     print("Created experiment {}".format(exp_id))
+    if warnings and bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED in warnings:
+        warning = (
+            "Warning: The submitted experiment requires more slots than currently available. "
+            "You may need to increase cluster resources in order for the job to run."
+        )
+        print(colored(warning, "yellow"))
     if activate and follow_first_trial_logs:
         api.follow_experiment_logs(master_url, exp_id)
     return exp_id
