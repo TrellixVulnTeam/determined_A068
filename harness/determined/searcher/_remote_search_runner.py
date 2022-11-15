@@ -52,7 +52,7 @@ class RemoteSearchRunner(searcher.SearchRunner):
             logger.info(f"Resuming HP searcher for experiment {experiment_id}")
         else:
             logger.info("No latest checkpoint. Starting new experiment.")
-            exp = client.create_experiment(exp_config, model_dir)
+            exp, _ = client.create_experiment(exp_config, model_dir)
             self.state.experiment_id = exp.id
             self.state.last_event_id = 0
             self.save_state(exp.id, [])
