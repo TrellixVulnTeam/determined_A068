@@ -10,7 +10,6 @@ from termcolor import colored
 
 from determined.common import api, constants, context, yaml
 from determined.common.api import bindings, logs
-from determined.common.api import request
 from determined.common.api import request as req
 
 
@@ -264,8 +263,8 @@ def create_experiment_and_follow_logs(
     )
     print("Created experiment {}".format(exp_id))
 
-    warnings = request.parse_warnings(warnings)
-    request.handle_warnings(warnings)
+    warnings = req.parse_warnings(warnings)
+    req.handle_warnings(warnings)
 
     if activate and follow_first_trial_logs:
         api.follow_experiment_logs(master_url, exp_id)

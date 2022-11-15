@@ -25,7 +25,7 @@ hyperparameters:
     nodes: 4
 
 resources:
-  slots_per_trial: 2
+  slots_per_trial: 6
 
 min_validation_period: 
   batches: 100
