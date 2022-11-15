@@ -10,6 +10,7 @@ export type ExperimentColumnName =
   | 'description'
   | 'duration'
   | 'forkedFrom'
+  | 'groupName'
   | 'id'
   | 'name'
   | 'progress'
@@ -39,6 +40,7 @@ export const DEFAULT_COLUMN_WIDTHS: Record<ExperimentColumnName, number> = {
   description: 148,
   duration: 96,
   forkedFrom: 128,
+  groupName: 150,
   id: 60,
   name: 150,
   numTrials: 74,
@@ -102,6 +104,14 @@ const config: SettingsConfig = {
     {
       key: 'label',
       storageKey: 'label',
+      type: {
+        baseType: BaseType.String,
+        isArray: true,
+      },
+    },
+    {
+      key: 'group',
+      storageKey: 'group',
       type: {
         baseType: BaseType.String,
         isArray: true,
