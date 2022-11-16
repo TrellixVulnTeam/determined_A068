@@ -28,6 +28,7 @@ class _InteractiveCommandProcess:
             while line and not m:
                 m = re.search(rb"Scheduling .* \(id: (.*)\)", line)
                 line = next(iterator)
+            assert m is not None
             self.task_id = m.group(1).decode() if m else None
 
     @property
