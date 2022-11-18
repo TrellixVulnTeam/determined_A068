@@ -719,7 +719,7 @@ const ExperimentList: React.FC<Props> = ({ project }) => {
         });
       }
     },
-    [fetchExperiments, sendBatchActions, updateSettings, settings.row],
+    [fetchExperiments, sendBatchActions, updateSettings],
   );
 
   const showConfirmation = useCallback(
@@ -750,8 +750,8 @@ const ExperimentList: React.FC<Props> = ({ project }) => {
   );
 
   const handleTableRowSelect = useCallback(
-    (rowKeys) => {
-      updateSettings({ row: rowKeys });
+    (rowKeys: unknown) => {
+      updateSettings({ row: rowKeys as number[] });
     },
     [updateSettings],
   );

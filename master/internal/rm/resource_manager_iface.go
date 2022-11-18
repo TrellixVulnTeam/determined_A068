@@ -32,6 +32,7 @@ type ResourceManager interface {
 		ctx actor.Messenger, name string, slots int, command bool,
 	) error
 	DeleteJob(actor.Messenger, sproto.DeleteJob) (sproto.DeleteJobResponse, error)
+	NotifyContainerRunning(actor.Messenger, sproto.NotifyContainerRunning) error
 
 	// Scheduling related stuff
 	SetGroupMaxSlots(actor.Messenger, sproto.SetGroupMaxSlots)

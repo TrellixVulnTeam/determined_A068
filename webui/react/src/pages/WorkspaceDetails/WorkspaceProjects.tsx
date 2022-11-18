@@ -111,21 +111,21 @@ const WorkspaceProjects: React.FC<Props> = ({ workspace, id, pageRef }) => {
   }, [fetchProjects]);
 
   const handleViewSelect = useCallback(
-    (value) => {
-      updateSettings({ whose: value });
+    (value: unknown) => {
+      updateSettings({ whose: value as WhoseProjects | undefined });
     },
     [updateSettings],
   );
 
   const handleSortSelect = useCallback(
-    (value) => {
+    (value: unknown) => {
       updateSettings({
         sortDesc:
           value === V1GetWorkspaceProjectsRequestSortBy.NAME ||
           value === V1GetWorkspaceProjectsRequestSortBy.LASTEXPERIMENTSTARTTIME
             ? false
             : true,
-        sortKey: value,
+        sortKey: value as V1GetWorkspaceProjectsRequestSortBy | undefined,
       });
     },
     [updateSettings],
@@ -152,7 +152,7 @@ const WorkspaceProjects: React.FC<Props> = ({ workspace, id, pageRef }) => {
     }
   }, [settings.whose, updateSettings, user, users]);
 
-  const saveProjectDescription = useCallback(async (newDescription, projectId: number) => {
+  const saveProjectDescription = useCallback(async (newDescription: string, projectId: number) => {
     try {
       await patchProject({ description: newDescription, id: projectId });
     } catch (e) {
@@ -289,7 +289,15 @@ const WorkspaceProjects: React.FC<Props> = ({ workspace, id, pageRef }) => {
   );
 
   const actionDropdown = useCallback(
-    ({ record, onVisibleChange, children }) => (
+    ({
+      record,
+      onVisibleChange,
+      children,
+    }: {
+      children: React.ReactNode;
+      onVisibleChange?: (visible: boolean) => void;
+      record: Project;
+    }) => (
       <ProjectActionDropdown
         curUser={user}
         project={record}
@@ -300,7 +308,8 @@ const WorkspaceProjects: React.FC<Props> = ({ workspace, id, pageRef }) => {
         {children}
       </ProjectActionDropdown>
     ),
-    [fetchProjects, user, workspace?.archived],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [user, workspace?.archived],
   );
 
   const projectsList = useMemo(() => {

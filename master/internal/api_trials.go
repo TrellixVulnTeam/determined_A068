@@ -414,7 +414,7 @@ func (a *apiServer) TrialLogsFields(
 		return resp.Send(&apiv1.TrialLogsFieldsResponse{
 			AgentIds:     setString(append(r1.AgentIds, r2.AgentIds...)...),
 			ContainerIds: setString(append(r1.ContainerIds, r2.ContainerIds...)...),
-			RankIds:      setInt32(append(r1.RankIds, r2.RankIds...)...),
+			RankIds:      setString(append(r1.RankIds, r2.RankIds...)...),
 			Stdtypes:     setString(append(r1.Stdtypes, r2.Stdtypes...)...),
 			Sources:      setString(append(r1.Sources, r2.Sources...)...),
 		})
@@ -999,6 +999,29 @@ func (a *apiServer) AllocationPendingPreemptionSignal(
 	return &apiv1.AllocationPendingPreemptionSignalResponse{}, nil
 }
 
+func (a *apiServer) NotifyContainerRunning(
+	ctx context.Context,
+	req *apiv1.NotifyContainerRunningRequest,
+) (*apiv1.NotifyContainerRunningResponse, error) {
+	if err := a.canEditAllocation(ctx, req.AllocationId); err != nil {
+		return nil, err
+	}
+
+	if err := a.m.rm.NotifyContainerRunning(
+		a.m.system,
+		sproto.NotifyContainerRunning{
+			AllocationID: model.AllocationID(req.AllocationId),
+			NumPeers:     req.NumPeers,
+			Rank:         req.Rank,
+			NodeName:     req.NodeName,
+		},
+	); err != nil {
+		return nil, err
+	}
+
+	return &apiv1.NotifyContainerRunningResponse{}, nil
+}
+
 func (a *apiServer) MarkAllocationResourcesDaemon(
 	ctx context.Context, req *apiv1.MarkAllocationResourcesDaemonRequest,
 ) (*apiv1.MarkAllocationResourcesDaemonResponse, error) {
@@ -1274,19 +1297,6 @@ func (a *apiServer) isTrialTerminalFunc(trialID int, buffer time.Duration) api.T
 		}
 		return false, nil
 	}
-}
-
-func setInt32(xs ...int32) []int32 {
-	s := map[int32]bool{}
-	for _, x := range xs {
-		s[x] = true
-	}
-
-	var nxs []int32
-	for x := range s {
-		nxs = append(nxs, x)
-	}
-	return nxs
 }
 
 func setString(xs ...string) []string {
