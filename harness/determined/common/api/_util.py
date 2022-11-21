@@ -13,7 +13,7 @@ class PageOpts(str, enum.Enum):
 # The Paginated union type is generated based on response objects with a .pagination attribute.
 T = TypeVar("T", bound=bindings.Paginated)
 
-# Maps launch warnings to the warning messages shown to users.
+# Map of launch warnings to the warning message shown to users.
 WARNING_MESSAGE_MAP = {
     bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED: (
         "Warning: The requested job requires more slots than currently available. "

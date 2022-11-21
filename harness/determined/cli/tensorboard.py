@@ -62,6 +62,7 @@ def start_tensorboard(args: Namespace) -> None:
                             currentSlotsExceeded=currentSlotsExceeded,
                         ),
                     )
+
                 print(colored("TensorBoard is running at: {}".format(url), "green"))
                 command.render_event_stream(msg)
                 break
