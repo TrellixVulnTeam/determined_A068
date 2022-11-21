@@ -175,13 +175,11 @@ func (a AgentResourceManager) ValidateResourcePoolAvailability(ctx actor.Messeng
 	if slots == 0 {
 		return nil, nil
 	}
-	currentMaxSlotsExceeded, err := a.CheckMaxSlotsExceeded(ctx, name, slots)
-	if err != nil {
-		return nil, fmt.Errorf("validating request for (%s, %d): %w", name, slots, err)
-	}
 
-	switch currentMaxSlotsExceeded {
-	case true:
+	switch exceeded, err := a.CheckMaxSlotsExceeded(ctx, name, slots); {
+	case err != nil:
+		return nil, fmt.Errorf("validating request for (%s, %d): %w", name, slots, err)
+	case exceeded:
 		return []command.LaunchWarning{command.CurrentSlotsExceeded}, nil
 	default:
 		return nil, nil
