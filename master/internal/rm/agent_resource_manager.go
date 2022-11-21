@@ -11,8 +11,6 @@ import (
 	"github.com/determined-ai/determined/master/pkg/aproto"
 	"github.com/determined-ai/determined/master/pkg/model"
 
-	"github.com/pkg/errors"
-
 	"github.com/determined-ai/determined/master/internal/config"
 	"github.com/determined-ai/determined/master/internal/db"
 	"github.com/determined-ai/determined/master/internal/sproto"
@@ -22,6 +20,7 @@ import (
 	"github.com/determined-ai/determined/proto/pkg/apiv1"
 	"github.com/determined-ai/determined/proto/pkg/jobv1"
 	"github.com/determined-ai/determined/proto/pkg/resourcepoolv1"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -100,20 +99,23 @@ func (a AgentResourceManager) IsReattachEnabledForRP(ctx actor.Messenger, rpName
 func (a AgentResourceManager) CheckMaxSlotsExceeded(
 	ctx actor.Messenger, name string, slots int,
 ) (bool, error) {
-	agents, err := a.GetAgents(ctx, &apiv1.GetAgentsRequest{})
+
+	ref, err := a.GetResourcePoolRef(ctx, name)
+
 	if err != nil {
-		return false, fmt.Errorf("unable to query agents for resource pool %v", name)
-	}
-	maxSlots := 0
-	for _, agent := range agents.Agents {
-		for _, resPool := range agent.ResourcePools {
-			if resPool == name {
-				maxSlots += len(agent.Slots)
-			}
+		return false, err
+
+		req := sproto.CapacityCheck{
+			Slots: slots,
 		}
-	}
-	if slots > maxSlots {
-		return true, nil
+		if resp := askAt(
+			ref.System(),
+			sproto.AgentsAddr,
+			req,
+			&req,
+		); resp != nil {
+			return false, err
+		}
 	}
 	return false, nil
 }

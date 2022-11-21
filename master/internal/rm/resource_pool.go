@@ -470,6 +470,29 @@ func (rp *ResourcePool) Receive(ctx *actor.Context) error {
 		}()
 		ctx.Respond(getResourceSummary(rp.agentStatesCache))
 
+	case sproto.CapacityCheck:
+		var totalSlots int
+
+		switch {
+		case rp.config.Provider == nil:
+			for _, a := range rp.agentStatesCache {
+				totalSlots += len(a.slotStates)
+			}
+		case rp.config.Provider.AWS != nil:
+			totalSlots = rp.config.Provider.MaxInstances * rp.config.Provider.AWS.SlotsPerInstance()
+		case rp.config.Provider.GCP != nil:
+			totalSlots = rp.config.Provider.MaxInstances * rp.config.Provider.GCP.SlotsPerInstance()
+		default:
+			panic("Invalid provider")
+		}
+		if totalSlots < msg.Slots {
+			return fmt.Errorf("requesting %v slots but resource pool only has %v available",
+				msg.Slots,
+				totalSlots,
+			)
+		}
+		return nil
+
 	case aproto.GetRPConfig:
 		reschedule = false
 		ctx.Respond(aproto.GetRPResponse{
