@@ -123,7 +123,7 @@ func newExperiment(m *Master, expModel *model.Experiment, taskSpec *tasks.TaskSp
 	*experiment, []command.LaunchWarning, error,
 ) {
 	conf := &expModel.Config
-	var launchWarnings []command.LaunchWarning
+
 	resources := conf.Resources()
 	poolName, err := m.rm.ResolveResourcePool(
 		m.system, resources.ResourcePool(), resources.SlotsPerTrial(),
@@ -134,7 +134,7 @@ func newExperiment(m *Master, expModel *model.Experiment, taskSpec *tasks.TaskSp
 	if err = m.rm.ValidateResources(m.system, poolName, resources.SlotsPerTrial(), false); err != nil {
 		return nil, nil, fmt.Errorf("validating resources: %v", err)
 	}
-	launchWarnings, err = m.rm.ValidateResourcePoolAvailability(
+	launchWarnings, err := m.rm.ValidateResourcePoolAvailability(
 		m.system,
 		poolName,
 		resources.SlotsPerTrial(),

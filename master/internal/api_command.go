@@ -57,7 +57,6 @@ func (a *apiServer) getCommandLaunchParams(ctx context.Context, req *protoComman
 ) {
 	var err error
 
-	var launchWarnings []command.LaunchWarning
 	// Validate the userModel and get the agent userModel group.
 	userModel, _, err := grpcutil.GetUser(ctx)
 	if err != nil {
@@ -95,7 +94,7 @@ func (a *apiServer) getCommandLaunchParams(ctx context.Context, req *protoComman
 		return nil, nil, fmt.Errorf("validating resources: %v", err)
 	}
 
-	launchWarnings, err = a.m.rm.ValidateResourcePoolAvailability(
+	launchWarnings, err := a.m.rm.ValidateResourcePoolAvailability(
 		a.m.system,
 		poolName,
 		resources.Slots,

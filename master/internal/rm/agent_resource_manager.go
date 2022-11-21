@@ -172,8 +172,6 @@ func (a AgentResourceManager) ValidateResourcePoolAvailability(ctx actor.Messeng
 	[]command.LaunchWarning,
 	error,
 ) {
-	var launchWarnings []command.LaunchWarning
-
 	if slots == 0 {
 		return nil, nil
 	}
@@ -181,10 +179,13 @@ func (a AgentResourceManager) ValidateResourcePoolAvailability(ctx actor.Messeng
 	if err != nil {
 		return nil, fmt.Errorf("validating request for (%s, %d): %w", name, slots, err)
 	}
-	if currentMaxSlotsExceeded {
-		launchWarnings = append(launchWarnings, command.CurrentSlotsExceeded)
+
+	switch currentMaxSlotsExceeded {
+	case true:
+		return []command.LaunchWarning{command.CurrentSlotsExceeded}, nil
+	default:
+		return nil, nil
 	}
-	return launchWarnings, nil
 }
 
 // GetAgents gets the state of connected agents. Go around the RM and directly to the agents actor
