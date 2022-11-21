@@ -130,8 +130,6 @@ def create_experiment(
     additional_body_fields: Optional[Dict[str, Any]] = None,
 ) -> Tuple[int, Optional[Sequence[bindings.v1LaunchWarning]]]:
 
-    warnings = None
-
     body = {
         "activate": False,
         "experiment_config": yaml.safe_dump(config),
@@ -156,12 +154,14 @@ def create_experiment(
     try:
         j = r.json()
     except json.decoder.JSONDecodeError:
-        warnings = None
+        warnings: Optional[list[bindings.v1LaunchWarning]] = None
     else:
-        warnings: list[bindings.v1LaunchWarning] = j.get("warnings")
-        if warnings:
+        response_warnings: Optional[list[int]] = j.get("warnings")
+        if response_warnings:
             launch_warnings = list(bindings.v1LaunchWarning)
-            warnings = [launch_warnings[warning] for warning in warnings]
+            warnings = [launch_warnings[warning] for warning in response_warnings]
+        else:
+            warnings = None
 
     new_resource = r.headers["Location"]
     experiment_id = int(new_resource.split("/")[-1])
