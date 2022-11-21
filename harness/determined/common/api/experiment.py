@@ -154,12 +154,14 @@ def create_experiment(
         return 0, None
 
     try:
-        warnings = r.json().get("warnings")
+        j = r.json()
+    except json.decoder.JSONDecodeError:
+        warnings = None
+    else:
+        warnings: list[bindings.v1LaunchWarning] = j.get("warnings")
         if warnings:
             launch_warnings = list(bindings.v1LaunchWarning)
-            warnings = [launch_warnings[warning].value for warning in warnings]
-    except json.decoder.JSONDecodeError:
-        pass
+            warnings = [launch_warnings[warning] for warning in warnings]
 
     new_resource = r.headers["Location"]
     experiment_id = int(new_resource.split("/")[-1])
@@ -263,7 +265,6 @@ def create_experiment_and_follow_logs(
     )
     print("Created experiment {}".format(exp_id))
 
-    warnings = req.parse_warnings(warnings)
     req.handle_warnings(warnings)
 
     if activate and follow_first_trial_logs:

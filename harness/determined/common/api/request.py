@@ -1,5 +1,6 @@
 import json as _json
 import os
+import sys
 import webbrowser
 from types import TracebackType
 from typing import Any, Dict, Iterator, Optional, Sequence, Tuple, Union
@@ -12,6 +13,7 @@ from termcolor import colored
 
 import determined as det
 import determined.common.requests
+from determined.common import api
 from determined.common.api import authentication, bindings, certs, errors
 
 
@@ -365,35 +367,7 @@ def ws(host: str, path: str) -> WebSocket:
     return WebSocket(websocket)
 
 
-def parse_warnings(
-    warnings: Optional[Union[Sequence[bindings.v1LaunchWarning], Sequence[int]]]
-) -> Optional[Sequence[bindings.v1LaunchWarning]]:
-
-    # Warnings may be passed in as either an enum value or integer value
-    warning_message_int_to_enum_value = {
-        1: bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED
-    }
-
-    warning_enum_values: list[bindings.v1LaunchWarning] = []
-    if warnings:
-        for warning in warnings:
-            if isinstance(warning, int):
-                warning_value: int = warning
-                warning_enum_values.append(warning_message_int_to_enum_value[warning_value])
-            elif isinstance(warning, str):
-                warning_enum_value: bindings.v1LaunchWarning = bindings.v1LaunchWarning(warning)
-                warning_enum_values.append(warning_enum_value)
-
-    return warning_enum_values
-
-
 def handle_warnings(warnings: Optional[Sequence[bindings.v1LaunchWarning]]) -> None:
-    warning_message_map = {
-        bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED: (
-            "Warning: The requested job requires more slots than currently available. "
-            "You may need to increase cluster resources in order for the job to run."
-        )
-    }
     if warnings:
         for warning in warnings:
-            print(colored(warning_message_map[warning], "yellow"))
+            print(colored(api.WARNING_MESSAGE_MAP[warning], "yellow"), file=sys.stderr)

@@ -21,28 +21,24 @@ def start_tensorboard(args: Namespace) -> None:
         sys.exit(1)
 
     config = command.parse_config(args.config_file, None, args.config, [])
-    req_body = {
-        "config": config,
-        "trial_ids": args.trial_ids,
-        "experiment_ids": args.experiment_ids,
-    }
+    body = bindings.v1LaunchTensorboardRequest(
+        config=config,
+        trialIds=args.trial_ids,
+        experimentIds=args.experiment_ids,
+        files=context.read_v1_context(args.context, args.include),
+    )
 
-    req_body["files"] = context.read_legacy_context(args.context, args.include)
-
-    api_resp = api.post(args.master, "api/v1/tensorboards", json=req_body).json()
-
-    resp = api_resp["tensorboard"]
+    resp = bindings.post_LaunchTensorboard(cli.setup_session(args), body=body)
 
     if args.detach:
-        print(resp["id"])
+        print(resp.tensorboard.id)
         return
 
-    warnings = request.parse_warnings(api_resp.get("warnings"))
-    request.handle_warnings(warnings)
-    currentSlotsExceeded = (warnings is not None) and (
-        bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED in warnings
+    request.handle_warnings(resp.warnings)
+    currentSlotsExceeded = (resp.warnings is not None) and (
+        bindings.v1LaunchWarning.LAUNCH_WARNING_CURRENT_SLOTS_EXCEEDED in resp.warnings
     )
-    url = "tensorboard/{}/events".format(resp["id"])
+    url = "tensorboard/{}/events".format(resp.tensorboard.id)
     with api.ws(args.master, url) as ws:
         for msg in ws:
             if msg["log_event"] is not None:
@@ -51,17 +47,17 @@ def start_tensorboard(args: Namespace) -> None:
                 if "http" in msg["log_event"]:
                     continue
 
-            if msg["service_ready_event"]:
+            if msg["service_ready_event"] and resp.tensorboard.serviceAddress is not None:
                 if args.no_browser:
-                    url = api.make_url(args.master, resp["serviceAddress"])
+                    url = api.make_url(args.master, resp.tensorboard.serviceAddress)
                 else:
                     url = api.browser_open(
                         args.master,
                         request.make_interactive_task_url(
-                            task_id=resp["id"],
-                            service_address=resp["serviceAddress"],
-                            resource_pool=resp["resourcePool"],
-                            description=resp["description"],
+                            task_id=resp.tensorboard.id,
+                            service_address=resp.tensorboard.serviceAddress,
+                            resource_pool=resp.tensorboard.resourcePool,
+                            description=resp.tensorboard.description,
                             task_type="tensorboard",
                             currentSlotsExceeded=currentSlotsExceeded,
                         ),

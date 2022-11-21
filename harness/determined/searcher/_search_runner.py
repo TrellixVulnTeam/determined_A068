@@ -268,7 +268,7 @@ class LocalSearchRunner(SearchRunner):
             # load searcher state and search method state
             _, operations = self.load_state(experiment_id)
         else:
-            exp, _ = client.create_experiment(exp_config, model_dir)
+            exp = client.create_experiment(exp_config, model_dir)
             with experiment_id_file.open("w") as f:
                 f.write(str(exp.id))
             state_path = self._get_state_path(exp.id)

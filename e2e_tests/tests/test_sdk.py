@@ -28,10 +28,10 @@ def test_completed_experiment_and_checkpoint_apis(client: _client.Determined) ->
     emptydir = tempfile.mkdtemp()
     try:
         model_def = conf.fixtures_path("no_op/model_def.py")
-        exp, _ = client.create_experiment(config, emptydir, includes=[model_def])
+        exp = client.create_experiment(config, emptydir, includes=[model_def])
     finally:
         os.rmdir(emptydir)
-    exp, _ = client.create_experiment(config, conf.fixtures_path("no_op"))
+    exp = client.create_experiment(config, conf.fixtures_path("no_op"))
 
     # Await first trial is safe to call before a trial has started.
     trial = exp.await_first_trial()
@@ -88,7 +88,7 @@ def _make_live_experiment(client: _client.Determined) -> _client.ExperimentRefer
     with open(conf.fixtures_path("no_op/single-very-many-long-steps.yaml")) as f:
         config = yaml.safe_load(f)
 
-    exp, _ = client.create_experiment(config, conf.fixtures_path("no_op"))
+    exp = client.create_experiment(config, conf.fixtures_path("no_op"))
     # Wait for a trial to actually start.
     start = time.time()
     deadline = start + 90
@@ -193,7 +193,7 @@ def test_models(client: _client.Determined) -> None:
 def test_model_versions(client: _client.Determined) -> None:
     with open(conf.fixtures_path("no_op/single-one-short-step.yaml")) as f:
         config = yaml.safe_load(f)
-    exp, _ = client.create_experiment(config, conf.fixtures_path("no_op"))
+    exp = client.create_experiment(config, conf.fixtures_path("no_op"))
     assert exp.wait() == _client.ExperimentState.COMPLETED
     ckpt = exp.top_checkpoint()
 
