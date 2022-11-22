@@ -472,7 +472,7 @@ func (rp *ResourcePool) Receive(ctx *actor.Context) error {
 
 	case sproto.CapacityCheck:
 		var totalSlots int
-
+		var capacityExceeded bool
 		switch {
 		case rp.config.Provider == nil:
 			for _, a := range rp.agentStatesCache {
@@ -485,13 +485,18 @@ func (rp *ResourcePool) Receive(ctx *actor.Context) error {
 		default:
 			panic("Invalid provider")
 		}
-		if totalSlots < msg.Slots {
-			return fmt.Errorf("requesting %v slots but resource pool only has %v available",
-				msg.Slots,
-				totalSlots,
-			)
+
+		switch {
+		case totalSlots < msg.Slots:
+			capacityExceeded = true
+		default:
+			capacityExceeded = false
 		}
-		return nil
+
+		ctx.Respond(sproto.CapacityCheckResponse{
+			CapacityExceeded: capacityExceeded,
+			SlotsAvailable:   totalSlots,
+		})
 
 	case aproto.GetRPConfig:
 		reschedule = false

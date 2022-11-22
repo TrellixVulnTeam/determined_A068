@@ -11,6 +11,8 @@ import (
 	"github.com/determined-ai/determined/master/pkg/aproto"
 	"github.com/determined-ai/determined/master/pkg/model"
 
+	"github.com/pkg/errors"
+
 	"github.com/determined-ai/determined/master/internal/config"
 	"github.com/determined-ai/determined/master/internal/db"
 	"github.com/determined-ai/determined/master/internal/sproto"
@@ -20,7 +22,6 @@ import (
 	"github.com/determined-ai/determined/proto/pkg/apiv1"
 	"github.com/determined-ai/determined/proto/pkg/jobv1"
 	"github.com/determined-ai/determined/proto/pkg/resourcepoolv1"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -99,25 +100,17 @@ func (a AgentResourceManager) IsReattachEnabledForRP(ctx actor.Messenger, rpName
 func (a AgentResourceManager) CheckMaxSlotsExceeded(
 	ctx actor.Messenger, name string, slots int,
 ) (bool, error) {
-
 	ref, err := a.GetResourcePoolRef(ctx, name)
-
 	if err != nil {
 		return false, err
-
-		req := sproto.CapacityCheck{
-			Slots: slots,
-		}
-		if resp := askAt(
-			ref.System(),
-			sproto.AgentsAddr,
-			req,
-			&req,
-		); resp != nil {
-			return false, err
-		}
 	}
-	return false, nil
+	resp := ref.System().Ask(ref, sproto.CapacityCheck{
+		Slots: slots,
+	})
+	if resp.Error() != nil {
+		return false, resp.Error()
+	}
+	return resp.Get().(sproto.CapacityCheckResponse).CapacityExceeded, nil
 }
 
 // ResolveResourcePool fully resolves the resource pool name.
